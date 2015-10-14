@@ -1,6 +1,6 @@
 import bpy
 import json
-
+ 
 def guarda():
     # nodes
     matlist = {}
