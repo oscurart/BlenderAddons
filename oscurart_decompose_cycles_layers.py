@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
+# USAGE: Enable compositor nodes and run script!
 
 import bpy
 
