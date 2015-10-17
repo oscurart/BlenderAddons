@@ -17,30 +17,35 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
+# INSTRUCTIONS: Select object for export, and set "save" in action variable, and run. Set action as "load" and hit run for load!
 
 import bpy
 import json
 
 action = "save"
  
-ob = bpy.context.object
- 
-ver = [vert.co[:] for vert in ob.data.vertices]
-edg =  [edge.vertices[:] for edge in ob.data.edges]
-fac =  [face.vertices[:] for face in ob.data.polygons]
-
-data = {"vertices" : ver, "edges" : edg, "faces" : fac}
-
-path = bpy.data.filepath.replace(".blend",".json")
+path = bpy.data.filepath.replace(".blend",".json")  
 
 if action == "save":
+    entireData = {}
+    for ob in bpy.context.selected_objects:  
+        ver = [vert.co[:] for vert in ob.data.vertices]
+        edg =  [edge.vertices[:] for edge in ob.data.edges]
+        fac =  [face.vertices[:] for face in ob.data.polygons]
+        uvs = {ul.name : {i : [loop.uv[0],loop.uv[1]] for i,loop in enumerate(ul.data) } for ul in bpy.context.object.data.uv_layers }
+        entireData[ob.name] = {"vertices" : ver, "edges" : edg, "faces" : fac, "uvs" : uvs} 
     with open(path, "w") as file:
-        json.dump(data, file, ensure_ascii=False)
+        json.dump(entireData, file, ensure_ascii=False)
+        
 if action == "load":    
     with open(path, "r") as file:
         ndata = json.load(file)
-        odata = bpy.data.meshes.new("mesh")
-        object = bpy.data.objects.new("NewObject",odata)
-        odata.from_pydata(ndata["vertices"],ndata["edges"],ndata["faces"])
-        bpy.context.scene.objects.link(object)
+        for ob in ndata:
+            odata = bpy.data.meshes.new(ob+"_mesh")
+            object = bpy.data.objects.new(ob,odata)
+            odata.from_pydata(ndata[ob]["vertices"],ndata[ob]["edges"],ndata[ob]["faces"])
+            bpy.context.scene.objects.link(object)
+            for uv in ndata[ob]["uvs"]:
+                newuv = object.data.uv_textures.new(name=uv)
+                for i,loop in ndata[ob]["uvs"][uv].items():
+                    object.data.uv_layers[uv].data[int(i)].uv = loop
