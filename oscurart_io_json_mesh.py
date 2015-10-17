@@ -32,7 +32,7 @@ if action == "save":
         ver = [vert.co[:] for vert in ob.data.vertices]
         edg =  [edge.vertices[:] for edge in ob.data.edges]
         fac =  [face.vertices[:] for face in ob.data.polygons]
-        uvs = {ul.name : {i : [loop.uv[0],loop.uv[1]] for i,loop in enumerate(ul.data) } for ul in bpy.context.object.data.uv_layers }
+        uvs = {ul.name : {i : [loop.uv[0],loop.uv[1]] for i,loop in enumerate(ul.data) } for ul in ob.data.uv_layers }
         entireData[ob.name] = {"vertices" : ver, "edges" : edg, "faces" : fac, "uvs" : uvs} 
     with open(path, "w") as file:
         json.dump(entireData, file, ensure_ascii=False)
