@@ -44,6 +44,7 @@ if action == "load":
             odata = bpy.data.meshes.new(ob+"_mesh")
             object = bpy.data.objects.new(ob,odata)
             odata.from_pydata(ndata[ob]["vertices"],ndata[ob]["edges"],ndata[ob]["faces"])
+            odata.update()
             bpy.context.scene.objects.link(object)
             for uv in ndata[ob]["uvs"]:
                 newuv = object.data.uv_textures.new(name=uv)
