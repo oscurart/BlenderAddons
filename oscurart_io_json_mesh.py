@@ -22,7 +22,7 @@
 import bpy
 import json
 
-import json
+action = "save"
  
 ob = bpy.context.object
  
@@ -34,14 +34,13 @@ data = {"vertices" : ver, "edges" : edg, "faces" : fac}
 
 path = bpy.data.filepath.replace(".blend",".json")
 
-with open(path, "w") as file:
-    json.dump(data, file, ensure_ascii=False)
-    
-with open(path, "r") as file:
-    ndata = json.load(file)
-     
-
-odata = bpy.data.meshes.new("mesh")
-object = bpy.data.objects.new("NewObject",odata)
-odata.from_pydata(ndata["vertices"],ndata["edges"],ndata["faces"])
-bpy.context.scene.objects.link(object)
+if action == "save":
+    with open(path, "w") as file:
+        json.dump(data, file, ensure_ascii=False)
+if action == "load":    
+    with open(path, "r") as file:
+        ndata = json.load(file)
+        odata = bpy.data.meshes.new("mesh")
+        object = bpy.data.objects.new("NewObject",odata)
+        odata.from_pydata(ndata["vertices"],ndata["edges"],ndata["faces"])
+        bpy.context.scene.objects.link(object)
