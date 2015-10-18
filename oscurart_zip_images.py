@@ -17,10 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
-
-
-# abrir la escena y correr. Recordar previamente hacer todos los paths absolutos
+# Uso Instrucciones: Crea un collect en zip con todas las imagenes linkeadas al .blend. Abrir la escena y correr. Recordar previamente hacer todos los paths absolutos
+# Make a collect with all images linked to blend file. Open the script and run. Remember make all paths absolute first!
 
 import zipfile
 import bpy

@@ -19,7 +19,8 @@
 # Author: Eugenio Pignataro Oscurart
 # Mail: Info@oscurart.com.ar
 # Website: www.oscurart.com.ar
-
+# Uso Instrucciones: Crea un sky conectado a un sun lamp. Seleccionar la lampara y correr.
+# Create a sky connected with a sun lamp. Select a lamp and run.
 
 import bpy
 

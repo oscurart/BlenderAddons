@@ -18,7 +18,7 @@
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
 # USAGE : This script save and load scene, cycles, and image settings.
-
+# This script is unstable! set path and uncomment the last lines! take care!
 
 import bpy
 import os

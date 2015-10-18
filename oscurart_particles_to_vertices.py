@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
+# Uso Instrucciones: Crea un mesh con vertices a partir de un sistema de particulas. Seleccionar el objeto con las particulas y correr.
+# Make a mesh object from selected particle system. Select the particle system object and run.
 
 
 import bpy

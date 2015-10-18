@@ -17,7 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
+# Uso Instrucciones: Habilita el uso de texturas para lamparas. Seleccionar un area lamp y correr.
+# Enable textures for area lamps. Select area lamp and run.
 
 
 import bpy

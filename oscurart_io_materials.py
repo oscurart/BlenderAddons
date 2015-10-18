@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
+# Uso Instrucciones: Sirve para guardar librerias de materiales basicos. Script aun inestable. En la linea final hay que descomentar la funcion a ejecutar.
 
 import bpy
 import json

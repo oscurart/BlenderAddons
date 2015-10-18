@@ -15,7 +15,9 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
-
+# Uso instrucciones: Exporta e importa camaras animadas en un formato muy facil de leer
+# y ser re interpretado por cualquier software.
+# Habilitar el addon y buscarlo en el search como Json Camera
 
 bl_info = {
     "name": "Camera Json Exporter/Importer",
