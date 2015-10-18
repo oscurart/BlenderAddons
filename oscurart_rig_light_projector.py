@@ -19,7 +19,7 @@
 # Author: Eugenio Pignataro Oscurart
 # Mail: Info@oscurart.com.ar
 # Website: www.oscurart.com.ar
-
+# Usage: select spot or area light and run. Then load the texture in the lamp node tree.
  
 import bpy
  

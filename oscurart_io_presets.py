@@ -17,7 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-
+# USAGE : This script save and load scene, cycles, and image settings.
 
 
 import bpy
