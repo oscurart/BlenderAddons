@@ -47,28 +47,31 @@ def OscSplineToArmature (context) :
         bone = amt.edit_bones.new("bone")
         bone.tail = (POINT.co[0]+sp.location.x, POINT.co[1]+sp.location.y, POINT.co[2]+1+sp.location.z)
         bone.head = (POINT.co[0]+sp.location.x, POINT.co[1]+sp.location.y, POINT.co[2]+sp.location.z)
-    
+        
+    bpy.ops.object.mode_set(mode="OBJECT")   
     bpy.context.scene.objects.active = sp    
     bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.object.mode_set(mode="EDIT")
-    
-    BONEINC = 0
-    for POINT in sp.data.splines[0].points[:]:
-        sp.modifiers.new("Hook", "HOOK")
-        sp.modifiers[-1].object = obj    
-        sp.modifiers[-1].subtarget = amt.bones[BONEINC].name        
+
+
+    for BONEINC,POINT in enumerate(sp.data.splines[0].points):
+        md = sp.modifiers.new("Hook", "HOOK")
+        md.object = obj    
+        md.subtarget = amt.bones[BONEINC].name        
         bpy.ops.curve.select_all(action='DESELECT')
-        POINT.select =1
-        bpy.ops.object.hook_assign(modifier=sp.modifiers[-1].name)
-        bpy.ops.object.hook_reset(modifier=sp.modifiers[-1].name)
-        BONEINC+=1
+        sp.data.splines[0].points[BONEINC].select = 1
+        POINT.select = 1
+        print(md.name)
+        bpy.ops.object.hook_assign(modifier=md.name)
+        bpy.ops.object.hook_reset(modifier=md.name)
+
 
     bpy.ops.object.mode_set(mode='OBJECT')
     obj.select = True
     bpy.context.scene.objects.active = obj
     bpy.ops.object.mode_set(mode='POSE')
     bpy.ops.pose.select_all(action='SELECT')
-    
+
+
 class oscClSplineToArmature (bpy.types.Operator):
 
     bl_idname = "armature.spline_to_armature"
