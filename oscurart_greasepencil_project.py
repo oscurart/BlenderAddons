@@ -61,17 +61,26 @@ def main(context,vaxis,gpAxis):
                 break
        
             if axis == 0:
-                vertice.co = (intersect_line_line(men,may,punto,(punto[0]+1,punto[1],punto[2]))[0][0],
-                    vertice.co.y,
-                    vertice.co.z)   
+                try:
+                    vertice.co = (intersect_line_line(men,may,punto,(punto[0]+1,punto[1],punto[2]))[0][0],
+                        vertice.co.y,
+                        vertice.co.z)   
+                except:
+                    pass        
             if axis == 1:
-                vertice.co = (vertice.co.x,
-                    intersect_line_line(men,may,punto,(punto[0],punto[1]+1,punto[2]))[0][1],
-                    vertice.co.z)                                   
-            if axis == 2:                               
-                vertice.co = (vertice.co.x,
-                    vertice.co.y,
-                    intersect_line_line(men,may,punto,(punto[0],punto[1],punto[2]+1))[0][2])           
+                try:
+                    vertice.co = (vertice.co.x,
+                        intersect_line_line(men,may,punto,(punto[0],punto[1]+1,punto[2]))[0][1],
+                        vertice.co.z)         
+                except:
+                    pass                                  
+            if axis == 2:    
+                try:                           
+                    vertice.co = (vertice.co.x,
+                        vertice.co.y,
+                        intersect_line_line(men,may,punto,(punto[0],punto[1],punto[2]+1))[0][2])     
+                except:
+                    pass              
     bmesh.update_edit_mesh(mesh.data)
 
 
@@ -105,7 +114,11 @@ class SimpleOperator(bpy.types.Operator):
             )
 
     def execute(self, context):
-        main(context,self.Axis,self.gpAxis)
+
+        if bpy.context.object.grease_pencil == None:
+            self.report({'ERROR'}, "You must set Grease Pencil!")
+        else:    
+            main(context,self.Axis,self.gpAxis)
         return {'FINISHED'}
 
 
