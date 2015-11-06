@@ -44,7 +44,7 @@ def main(context,vaxis,gpAxis):
         if vertice.select:
             imen = -1000
             imay = 1000
-            punto = vertice.co[:]
+            punto = vertice.co + mesh.location
             jj= [point.co for point in bpy.context.object.grease_pencil.layers.active.frames[0].strokes[0].points]
             for point in bpy.data.grease_pencil[0].layers.active.frames[0].strokes[0].points:
                 if point.co[gpaxis] < punto[gpaxis] and point.co[gpaxis] > imen:
