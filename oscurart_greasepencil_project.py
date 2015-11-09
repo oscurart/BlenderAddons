@@ -79,7 +79,7 @@ def main(context,vaxis,gpAxis):
                 try:                           
                     vertice.co = (vertice.co.x,
                         vertice.co.y,
-                        intersect_line_line(men,may,punto,(punto[0],punto[1],punto[2]+1))[0][2] - - mesh.location[2])     
+                        intersect_line_line(men,may,punto,(punto[0],punto[1],punto[2]+1))[0][2] - mesh.location[2])     
                 except:
                     pass              
     bmesh.update_edit_mesh(mesh.data)
