@@ -33,6 +33,7 @@ bl_info = {
 import bpy
 import bmesh
 from mathutils.geometry import intersect_line_line
+from mathutils import Vector
 
 def main(context,vaxis,gpAxis):
     axisdict = {"X":0,"Y":1,"Z":2}
@@ -62,7 +63,7 @@ def main(context,vaxis,gpAxis):
        
             if axis == 0:
                 try:
-                    vertice.co = (intersect_line_line(men,may,punto,(punto[0]+1,punto[1],punto[2]))[0][0],
+                    vertice.co = (intersect_line_line(men,may,punto,(punto[0]+1,punto[1],punto[2]))[0][0] - mesh.location[0],
                         vertice.co.y,
                         vertice.co.z)   
                 except:
@@ -70,7 +71,7 @@ def main(context,vaxis,gpAxis):
             if axis == 1:
                 try:
                     vertice.co = (vertice.co.x,
-                        intersect_line_line(men,may,punto,(punto[0],punto[1]+1,punto[2]))[0][1],
+                        intersect_line_line(men,may,punto,(punto[0],punto[1]+1,punto[2]))[0][1] - mesh.location[1],
                         vertice.co.z)         
                 except:
                     pass                                  
@@ -78,7 +79,7 @@ def main(context,vaxis,gpAxis):
                 try:                           
                     vertice.co = (vertice.co.x,
                         vertice.co.y,
-                        intersect_line_line(men,may,punto,(punto[0],punto[1],punto[2]+1))[0][2])     
+                        intersect_line_line(men,may,punto,(punto[0],punto[1],punto[2]+1))[0][2] - - mesh.location[2])     
                 except:
                     pass              
     bmesh.update_edit_mesh(mesh.data)
