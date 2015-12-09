@@ -27,7 +27,7 @@ def autoCrop(dummy):
     bpy.context.scene.render.use_border = True
     x, y = [], []
     for ob in bpy.data.objects:
-        if ob.type == "MESH":
+        if ob.type == "MESH" and ob.is_visible(bpy.context.scene):
             for vert in ob.data.vertices:
                 gl = ob.matrix_world * vert.co
                 cc = world_to_camera_view(bpy.context.scene, bpy.context.scene.camera, gl)
