@@ -29,11 +29,13 @@ def autoCrop(dummy):
     x, y = [], []
     for ob in bpy.data.objects:
         if ob.type == "MESH" and ob.is_visible(bpy.context.scene):
-            for vert in ob.data.vertices:
+            nmesh = ob.to_mesh(bpy.context.scene,True,"RENDER")
+            for vert in nmesh.vertices:
                 gl = ob.matrix_world * vert.co
                 cc = world_to_camera_view(bpy.context.scene, bpy.context.scene.camera, gl)
                 x.append(cc[0])
-                y.append(cc[1])        
+                y.append(cc[1])   
+        bpy.data.meshes.remove(nmesh)             
     x.sort()
     y.sort()
     bpy.context.scene.render.border_min_x = x[0]
