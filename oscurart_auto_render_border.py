@@ -54,3 +54,4 @@ def autoCrop(dummy):
     bpy.context.scene.render.border_max_y = y[-1]
 
 bpy.app.handlers.frame_change_pre.append(autoCrop)
+#bpy.app.handlers.render_init.append(autoCrop)
