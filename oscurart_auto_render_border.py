@@ -35,7 +35,7 @@ def autoCrop(dummy):
                 cc = world_to_camera_view(bpy.context.scene, bpy.context.scene.camera, gl)
                 x.append(cc[0])
                 y.append(cc[1])   
-        bpy.data.meshes.remove(nmesh)             
+            bpy.data.meshes.remove(nmesh)             
     x.sort()
     y.sort()
     bpy.context.scene.render.border_min_x = x[0]
