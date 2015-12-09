@@ -21,6 +21,7 @@
 
 
 import bpy
+from bpy.app.handlers import persistent
 from bpy_extras.object_utils import world_to_camera_view
 
 def autoCrop(dummy):
