@@ -27,7 +27,7 @@ from bpy_extras.object_utils import world_to_camera_view
 def autoCrop(dummy):
     bpy.context.scene.render.use_border = True
     x, y = [], []
-    for ob in bpy.data.objects:
+    for ob in bpy.context.visible_objects:
         if ob.type == "MESH" and ob.is_visible(bpy.context.scene):
             nmesh = ob.to_mesh(bpy.context.scene,True,"RENDER")
             for vert in nmesh.vertices:
@@ -53,4 +53,4 @@ def autoCrop(dummy):
     bpy.context.scene.render.border_min_y = y[0]
     bpy.context.scene.render.border_max_y = y[-1]
 
-bpy.app.handlers.render_init.append(autoCrop)
+bpy.app.handlers.frame_change_pre.append(autoCrop)
