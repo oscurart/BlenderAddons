@@ -53,6 +53,8 @@ def autoCrop(dummy):
     sc.render.border_max_x = x[-1]
     sc.render.border_min_y = y[0]
     sc.render.border_max_y = y[-1]
+    del x
+    del y
 
 bpy.app.handlers.frame_change_pre.append(autoCrop)
 bpy.app.handlers.render_init.append(autoCrop)
