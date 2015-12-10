@@ -56,5 +56,5 @@ def autoCrop(dummy):
     del x
     del y
 
-bpy.app.handlers.frame_change_pre.append(autoCrop)
+bpy.app.handlers.frame_change_post.append(autoCrop)
 bpy.app.handlers.render_init.append(autoCrop)
