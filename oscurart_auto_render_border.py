@@ -25,33 +25,34 @@ from bpy.app.handlers import persistent
 from bpy_extras.object_utils import world_to_camera_view
 
 def autoCrop(dummy):
-    bpy.context.scene.render.use_border = True
+    sc = bpy.context.scene
+    sc.render.use_border = True
     x, y = [], []
-    for ob in bpy.context.scene.objects:
-        if ob.type == "MESH" and ob.is_visible(bpy.context.scene):
-            nmesh = ob.to_mesh(bpy.context.scene,True,"RENDER")
+    for ob in sc.objects:
+        if ob.type == "MESH" and ob.is_visible(sc):
+            nmesh = ob.to_mesh(sc,True,"RENDER")
             for vert in nmesh.vertices:
                 gl = ob.matrix_world * vert.co
-                cc = world_to_camera_view(bpy.context.scene, bpy.context.scene.camera, gl)
+                cc = world_to_camera_view(sc, sc.camera, gl)
                 x.append(cc[0])
                 y.append(cc[1])   
             bpy.data.meshes.remove(nmesh)   
         if ob.dupli_type == "GROUP" and ob.type == "EMPTY":
             for iob in ob.dupli_group.objects:
-                if iob.type == "MESH" and ob.is_visible(bpy.context.scene):
-                    nmesh = iob.to_mesh(bpy.context.scene,True,"RENDER")
+                if iob.type == "MESH" and ob.is_visible(sc):
+                    nmesh = iob.to_mesh(sc,True,"RENDER")
                     for vert in nmesh.vertices:
                         gl = ob.matrix_world * iob.matrix_world * vert.co
-                        cc = world_to_camera_view(bpy.context.scene, bpy.context.scene.camera, gl)
+                        cc = world_to_camera_view(sc, sc.camera, gl)
                         x.append(cc[0])
                         y.append(cc[1])   
                     bpy.data.meshes.remove(nmesh)                         
     x.sort()
     y.sort()
-    bpy.context.scene.render.border_min_x = x[0]
-    bpy.context.scene.render.border_max_x = x[-1]
-    bpy.context.scene.render.border_min_y = y[0]
-    bpy.context.scene.render.border_max_y = y[-1]
+    sc.render.border_min_x = x[0]
+    sc.render.border_max_x = x[-1]
+    sc.render.border_min_y = y[0]
+    sc.render.border_max_y = y[-1]
 
-#bpy.app.handlers.frame_change_pre.append(autoCrop)
+bpy.app.handlers.frame_change_pre.append(autoCrop)
 bpy.app.handlers.render_init.append(autoCrop)
