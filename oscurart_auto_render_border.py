@@ -29,7 +29,7 @@ def autoCrop(dummy):
     sc.render.use_border = True
     x, y = [], []
     for ob in sc.objects:
-        if ob.type == "MESH" and ob.is_visible(sc):
+        if ob.type in ["MESH","FONT","CURVE","META"] and ob.is_visible(sc):
             nmesh = ob.to_mesh(sc,True,"RENDER")
             for vert in nmesh.vertices:
                 gl = ob.matrix_world * vert.co
