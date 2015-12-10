@@ -41,7 +41,7 @@ def autoCrop(dummy):
                 if iob.type == "MESH" and ob.is_visible(bpy.context.scene):
                     nmesh = iob.to_mesh(bpy.context.scene,True,"RENDER")
                     for vert in nmesh.vertices:
-                        gl = ob.matrix_world * vert.co
+                        gl = ob.matrix_world * iob.matrix_world * vert.co
                         cc = world_to_camera_view(bpy.context.scene, bpy.context.scene.camera, gl)
                         x.append(cc[0])
                         y.append(cc[1])   
