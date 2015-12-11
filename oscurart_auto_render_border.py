@@ -48,8 +48,9 @@ class AutomaticRenderBorder(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        row = layout.row()
+        row = layout.row(align=True)
         row.operator("render.automatic_render_border" , text="Play / Stop", icon="TRIA_RIGHT")
+        row.operator("render.automatic_render_border_set", text="Manual Set" , icon="STYLUS_PRESSURE")
         row = layout.row()
         row.prop(bpy.context.scene, "automatic_render_border_margin", text="Margin")
  
@@ -107,13 +108,25 @@ class ClassAutomaticRenderBorder(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class ClassAutomaticRenderBorderSet(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "render.automatic_render_border_set"
+    bl_label = "Automatic Render Border Set"
+
+    def execute(self, context):
+        autoCrop(1)
+        return {'FINISHED'}
+
+
 def register():
     bpy.utils.register_class(AutomaticRenderBorder)
     bpy.utils.register_class(ClassAutomaticRenderBorder)
+    bpy.utils.register_class(ClassAutomaticRenderBorderSet)
 
 def unregister():
     bpy.utils.unregister_class(AutomaticRenderBorder)
     bpy.utils.unregister_class(ClassAutomaticRenderBorder)
+    bpy.utils.register_class(ClassAutomaticRenderBorderSet)
 
 
 if __name__ == "__main__":
