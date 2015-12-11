@@ -39,7 +39,6 @@ from bpy_extras.object_utils import world_to_camera_view
 bpy.types.Scene.automatic_render_border_margin = bpy.props.FloatProperty(default=0, min=0, max=1)
 
 class AutomaticRenderBorder(bpy.types.Panel):
-    """Creates a Panel in the Object properties window"""
     bl_label = "Automatic Render Border"
     bl_idname = "RENDER_PT_renderBorder"
     bl_space_type = 'PROPERTIES'
@@ -99,7 +98,7 @@ def AutomaticRenderToggle(context):
 
 
 class ClassAutomaticRenderBorder(bpy.types.Operator):
-    """Tooltip"""
+    """Set render border automatically."""
     bl_idname = "render.automatic_render_border"
     bl_label = "Automatic Render Border"
 
@@ -109,7 +108,7 @@ class ClassAutomaticRenderBorder(bpy.types.Operator):
 
 
 class ClassAutomaticRenderBorderSet(bpy.types.Operator):
-    """Tooltip"""
+    """Set render border manually. Good for heavy scenes."""
     bl_idname = "render.automatic_render_border_set"
     bl_label = "Automatic Render Border Set"
 
