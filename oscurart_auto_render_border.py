@@ -19,16 +19,48 @@
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
 # USAGE: Run script!
 
+bl_info = {
+    "name": "Automatic Render Border",
+    "author": "Eugenio Pignataro (Oscurart)",
+    "version": (1, 0),
+    "blender": (2, 76, 0),
+    "location": "Properties > Render > Automatic Render Border",
+    "description": "Set Render Border Automatically",
+    "warning": "",
+    "wiki_url": "",
+    "category": "Render",
+    }
+
 
 import bpy
 from bpy.app.handlers import persistent
 from bpy_extras.object_utils import world_to_camera_view
 
+bpy.types.Scene.automatic_render_border_margin = bpy.props.FloatProperty(default=0, min=0, max=1)
+
+class AutomaticRenderBorder(bpy.types.Panel):
+    """Creates a Panel in the Object properties window"""
+    bl_label = "Automatic Render Border"
+    bl_idname = "RENDER_PT_renderBorder"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "render"
+
+    def draw(self, context):
+        layout = self.layout
+        row = layout.row()
+        row.operator("render.automatic_render_border" , text="Play / Stop", icon="TRIA_RIGHT")
+        row = layout.row()
+        row.prop(bpy.context.scene, "automatic_render_border_margin", text="Margin")
+ 
+
 def autoCrop(dummy):
+    margin = bpy.context.scene.automatic_render_border_margin
     sc = bpy.context.scene
     sc.render.use_border = True
     x, y = [], []
-    for ob in sc.objects:
+    objetos = [bpy.context.visible_objects[:] if len(bpy.context.selected_objects) == 0 else bpy.context.selected_objects[:]]
+    for ob in objetos[0]:
         if ob.type in ["MESH","FONT","CURVE","META"] and ob.is_visible(sc):
             nmesh = ob.to_mesh(sc,True,"RENDER")
             for vert in nmesh.vertices:
@@ -49,12 +81,40 @@ def autoCrop(dummy):
                     bpy.data.meshes.remove(nmesh)                         
     x.sort()
     y.sort()
-    sc.render.border_min_x = x[0]
-    sc.render.border_max_x = x[-1]
-    sc.render.border_min_y = y[0]
-    sc.render.border_max_y = y[-1]
+    sc.render.border_min_x = x[0] - margin
+    sc.render.border_max_x = x[-1] + margin
+    sc.render.border_min_y = y[0] - margin
+    sc.render.border_max_y = y[-1]  + margin
     del x
     del y
 
-bpy.app.handlers.frame_change_post.append(autoCrop)
-bpy.app.handlers.render_init.append(autoCrop)
+
+def AutomaticRenderToggle(context):
+    global a
+    try:
+        bpy.app.handlers.scene_update_post.remove(bpy.app.handlers.scene_update_post[-1])
+    except:
+        bpy.app.handlers.scene_update_post.append(autoCrop)
+
+
+class ClassAutomaticRenderBorder(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "render.automatic_render_border"
+    bl_label = "Automatic Render Border"
+
+    def execute(self, context):
+        AutomaticRenderToggle(context)
+        return {'FINISHED'}
+
+
+def register():
+    bpy.utils.register_class(AutomaticRenderBorder)
+    bpy.utils.register_class(ClassAutomaticRenderBorder)
+
+def unregister():
+    bpy.utils.unregister_class(AutomaticRenderBorder)
+    bpy.utils.unregister_class(ClassAutomaticRenderBorder)
+
+
+if __name__ == "__main__":
+    register()
