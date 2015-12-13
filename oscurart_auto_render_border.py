@@ -94,7 +94,7 @@ def autoCrop(dummy):
     del x
     del y
 
-
+@persistent
 def AutomaticRenderToggle(context):
     global a
     try:
