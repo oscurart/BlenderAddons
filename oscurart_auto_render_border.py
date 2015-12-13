@@ -94,6 +94,7 @@ def autoCrop(dummy):
     del x
     del y
 
+
 @persistent
 def AutomaticRenderToggle(context):
     global a
@@ -137,3 +138,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+
