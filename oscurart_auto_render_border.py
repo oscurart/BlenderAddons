@@ -1,3 +1,7 @@
+import bpy
+from bpy.app.handlers import persistent
+from bpy_extras.object_utils import world_to_camera_view
+
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
 #  This program is free software; you can redistribute it and/or
@@ -17,7 +21,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # AUTHOR: Eugenio Pignataro (Oscurart) www.oscurart.com.ar
-# USAGE: Run script!
+
 
 bl_info = {
     "name": "Automatic Render Border",
@@ -31,12 +35,9 @@ bl_info = {
     "category": "Render",
     }
 
+bpy.types.Scene.automatic_render_border_margin = \
+    bpy.props.FloatProperty(default=0, min=0, max=1)
 
-import bpy
-from bpy.app.handlers import persistent
-from bpy_extras.object_utils import world_to_camera_view
-
-bpy.types.Scene.automatic_render_border_margin = bpy.props.FloatProperty(default=0, min=0, max=1)
 
 class AutomaticRenderBorder(bpy.types.Panel):
     bl_label = "Automatic Render Border"
@@ -48,43 +49,48 @@ class AutomaticRenderBorder(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         row = layout.row(align=True)
-        row.operator("render.automatic_render_border" , text="Play / Stop", icon="TRIA_RIGHT")
-        row.operator("render.automatic_render_border_set", text="Manual Set" , icon="STYLUS_PRESSURE")
+        row.operator("render.automatic_render_border",
+                     text="Play / Stop", icon="TRIA_RIGHT")
+        row.operator("render.automatic_render_border_set",
+                     text="Manual Set", icon="STYLUS_PRESSURE")
         row = layout.row()
-        row.prop(bpy.context.scene, "automatic_render_border_margin", text="Margin")
- 
+        row.prop(bpy.context.scene,
+                 "automatic_render_border_margin", text="Margin")
+
 
 def autoCrop(dummy):
     margin = bpy.context.scene.automatic_render_border_margin
     sc = bpy.context.scene
     sc.render.use_border = True
     x, y = [], []
-    objetos = [bpy.context.visible_objects[:] if len(bpy.context.selected_objects) == 0 else bpy.context.selected_objects[:]]
+    objetos = [bpy.context.visible_objects[:] if len(
+        bpy.context.selected_objects) == 0 else
+        bpy.context.selected_objects[:]]
     for ob in objetos[0]:
-        if ob.type in ["MESH","FONT","CURVE","META"] and ob.is_visible(sc):
-            nmesh = ob.to_mesh(sc,True,"RENDER")
+        if ob.type in ["MESH", "FONT", "CURVE", "META"] and ob.is_visible(sc):
+            nmesh = ob.to_mesh(sc, True, "RENDER")
             for vert in nmesh.vertices:
                 gl = ob.matrix_world * vert.co
                 cc = world_to_camera_view(sc, sc.camera, gl)
                 x.append(cc[0])
-                y.append(cc[1])   
-            bpy.data.meshes.remove(nmesh)   
+                y.append(cc[1])
+            bpy.data.meshes.remove(nmesh)
         if ob.dupli_type == "GROUP" and ob.type == "EMPTY":
             for iob in ob.dupli_group.objects:
                 if iob.type == "MESH" and ob.is_visible(sc):
-                    nmesh = iob.to_mesh(sc,True,"RENDER")
+                    nmesh = iob.to_mesh(sc, True, "RENDER")
                     for vert in nmesh.vertices:
                         gl = ob.matrix_world * iob.matrix_world * vert.co
                         cc = world_to_camera_view(sc, sc.camera, gl)
                         x.append(cc[0])
-                        y.append(cc[1])   
-                    bpy.data.meshes.remove(nmesh)                         
+                        y.append(cc[1])
+                    bpy.data.meshes.remove(nmesh)
     x.sort()
     y.sort()
     sc.render.border_min_x = x[0] - margin
     sc.render.border_max_x = x[-1] + margin
     sc.render.border_min_y = y[0] - margin
-    sc.render.border_max_y = y[-1]  + margin
+    sc.render.border_max_y = y[-1]+margin
     del x
     del y
 
@@ -92,7 +98,8 @@ def autoCrop(dummy):
 def AutomaticRenderToggle(context):
     global a
     try:
-        bpy.app.handlers.scene_update_post.remove(bpy.app.handlers.scene_update_post[-1])
+        bpy.app.handlers.scene_update_post.remove(
+            bpy.app.handlers.scene_update_post[-1])
     except:
         bpy.app.handlers.scene_update_post.append(autoCrop)
 
@@ -122,11 +129,11 @@ def register():
     bpy.utils.register_class(ClassAutomaticRenderBorder)
     bpy.utils.register_class(ClassAutomaticRenderBorderSet)
 
+
 def unregister():
     bpy.utils.unregister_class(AutomaticRenderBorder)
     bpy.utils.unregister_class(ClassAutomaticRenderBorder)
     bpy.utils.register_class(ClassAutomaticRenderBorderSet)
-
 
 if __name__ == "__main__":
     register()
