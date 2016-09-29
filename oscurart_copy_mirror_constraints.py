@@ -14,46 +14,33 @@ bl_info = {
 
 import bpy
 
-def RENAMECONSTRAINT(self, BONE, SIDE, ACTOBJ, SELSIDE):
-
-    for CONSTRAINT in bpy.data.objects[ACTOBJ.name].pose.bones[BONE.name.replace(SELSIDE, SIDE)].constraints:
-        ## TYPES WITH SUBTARGET ONLY
-        print (CONSTRAINT.type)
-        if CONSTRAINT.type in ["COPY_LOCATION" , "COPY_ROTATION" , "COPY_SCALE" , "COPY_TRANSFORMS" , "LIMIT_DISTANCE" , "TRANSFORM" , "DAMPED_TRACK" , "LOCKED_TRACK" , "STRETCH_TO" , "TRACK_TO" , "ACTION" , "CHILD_OF" , "FLOOR" , "PIVOT"]:
-            CONSTRAINT.subtarget = CONSTRAINT.subtarget.replace(SELSIDE, SIDE)
-        
-        if CONSTRAINT.type == "IK":
-            CONSTRAINT.subtarget = CONSTRAINT.subtarget.replace(SELSIDE, SIDE)
-            CONSTRAINT.pole_subtarget = CONSTRAINT.pole_subtarget.replace(SELSIDE, SIDE)
-            
-
-        
-    
-    
-def copy_mirror_constraint(self):
-    SELBON = bpy.context.selected_pose_bones
-    ACTOBJ = bpy.context.active_object
-    
-    
-    for BONE in SELBON:
-        bpy.ops.pose.select_all(action='DESELECT')
-        if BONE.name.count("_L"): 
-            ACTOBJ.data.bones[BONE.name.replace("_L" ,"_R")].select=1
-            ACTOBJ.data.bones.active = bpy.data.armatures[ACTOBJ.data.name].bones[BONE.name]
-            SIDE="_R"
-            SELSIDE="_L"
+#reemplaza la ultima parte de un string l por r 
+def replaceCnsLR (token,cnsType):
+    switch = 0
+    for left in [".l",".L","_l","_L"]:
+        if token.count(left):
+            switch = 1  
+    if switch:        
+        return token.replace(".L",".R").replace(".l",".r").replace("_l","_r").replace("_L","_R")
+    else:
+        if cnsType == 1:
+            return token
         else:
-            ACTOBJ.data.bones[BONE.name.replace("_R" ,"_L")].select=1
-            ACTOBJ.data.bones.active = bpy.data.armatures[ACTOBJ.data.name].bones[BONE.name] 
-            SIDE="_L" 
-            SELSIDE="_R"
-               
+            print("%s havent mirror bone" % (token))
 
-        ## COPY CONSTRAINTS          
-        bpy.ops.pose.constraints_copy()
-        ## EXECUTE DEF
-        RENAMECONSTRAINT(self, BONE, SIDE, ACTOBJ, SELSIDE)
-        
+def copy_mirror_constraint(self):
+    for bone in bpy.context.selected_pose_bones:                
+        osb = bpy.context.object.pose.bones[replaceCnsLR(bone.name,0)] #other side bone
+         
+        for cns in bone.constraints:  
+            oscns = osb.constraints.new(cns.type) #other side constraint  
+            for propiedad in  dir(cns):        
+                try:
+                    setattr(oscns, propiedad, getattr(cns,propiedad))
+                    if propiedad == "subtarget":
+                        setattr(oscns, propiedad, replaceCnsLR(getattr(cns,propiedad),1))
+                except:
+                    print(type(getattr(oscns, propiedad)))
 
 
 class OBJECT_OT_add_object(bpy.types.Operator):
