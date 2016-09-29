@@ -37,7 +37,7 @@ def copy_mirror_constraint(self):
             for propiedad in  dir(cns):        
                 try:
                     setattr(oscns, propiedad, getattr(cns,propiedad))
-                    if propiedad == "subtarget":
+                    if propiedad in ["subtarget","pole_subtarget"]:
                         setattr(oscns, propiedad, replaceCnsLR(getattr(cns,propiedad),1))
                 except:
                     print(type(getattr(oscns, propiedad)))
