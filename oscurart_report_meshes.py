@@ -75,6 +75,7 @@ with open("%s" % (bpy.data.filepath.replace(".blend",".txt")), mode="w") as file
                 file.write("OBJECT WARNINGS: %s" % (warning))     
                  
             file.write("\n")
+            file.write("\n")
              
             
     
