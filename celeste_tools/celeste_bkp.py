@@ -1,20 +1,5 @@
-bl_info = {
-    "name": "Celeste Tools",
-    "author": "Eugenio Pignataro",
-    "version": (1, 0),
-    "blender": (2, 75, 0),
-    "location": "View3D > CelesteTools",
-    "description": "Tools for Anacronte",
-    "warning": "",
-    "wiki_url": "",
-    "category": "Add Mesh",
-    }
-
-
 import bpy
 import os
-
-
 
 # OPERADOR DUMMY
 def saveBkp (self, context):
@@ -52,13 +37,3 @@ class CelesteSaveBkp (bpy.types.Operator):
         return {'FINISHED'}
 
     
-# REGISTRA
-
-def register():
-    bpy.utils.register_class(CelesteSaveBkp)
-
-def unregister():
-    bpy.utils.unregister_class(CelesteSaveBkp)
-
-if __name__ == "__main__":
-    register()
