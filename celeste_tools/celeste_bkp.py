@@ -15,6 +15,7 @@ def saveBkp (self, context):
 
         savepath = "%s/VERSIONS/%s_v%02d.blend" % (os.path.dirname(bpy.data.filepath),bpy.path.basename(bpy.data.filepath).split('.')[0],filelower+1)   
         print("Copia versionada guardada.")   
+        bpy.ops.wm.save_as_mainfile()
         bpy.ops.wm.save_as_mainfile(filepath=savepath, copy=True)        
 
     else:        
