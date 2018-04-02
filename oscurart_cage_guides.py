@@ -2,6 +2,8 @@
 
 import bpy
 
+SUBDIVISIONS = 2
+
 me = bpy.data.meshes.new("mesh")
 ob = bpy.data.objects.new("object", me)
 
@@ -9,13 +11,13 @@ lr = bpy.context.object
 cage = bpy.data.objects[bpy.context.scene.render.bake.cage_object]
 
 ss = lr.modifiers.new("TMP","SUBSURF")
-ss.render_levels = 1
+ss.render_levels = SUBDIVISIONS
 ss.subdivision_type = "SIMPLE"
 nlr = lr.to_mesh(bpy.context.scene, True, "RENDER")
 lr.modifiers.remove(ss)
 
 ss = cage.modifiers.new("TMP","SUBSURF")
-ss.render_levels = 1
+ss.render_levels = SUBDIVISIONS
 ss.subdivision_type = "SIMPLE"
 ncage = cage.to_mesh(bpy.context.scene, True, "RENDER")
 cage.modifiers.remove(ss)
