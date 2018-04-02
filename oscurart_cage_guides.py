@@ -8,21 +8,32 @@ ob = bpy.data.objects.new("object", me)
 lr = bpy.context.object
 cage = bpy.data.objects[bpy.context.scene.render.bake.cage_object]
 
+ss = lr.modifiers.new("TMP","SUBSURF")
+ss.render_levels = 1
+nlr = lr.to_mesh(bpy.context.scene, True, "RENDER")
+lr.modifiers.remove(ss)
+
+ss = cage.modifiers.new("TMP","SUBSURF")
+ss.render_levels = 1
+ncage = cage.to_mesh(bpy.context.scene, True, "RENDER")
+cage.modifiers.remove(ss)
+
+
 verts = []
 
-
-for v in cage.data.vertices:    
+for v in ncage.vertices:    
     verts.append(cage.matrix_world * v.co ) 
 
-
-for v in lr.data.vertices :
+for v in nlr.vertices :
     verts.append(lr.matrix_world * v.co ) 
     
-lenVert = len(lr.data.vertices)    
-edges = [(i,i+lenVert)for i in range(0,len(lr.data.vertices))]
+lenVert = len(nlr.vertices)    
+edges = [(i,i+lenVert)for i in range(0,len(nlr.vertices))]
 
 
 me.from_pydata(verts, edges, [])
 
 bpy.context.scene.objects.link(ob)
 
+del(nlr)
+del(ncage)
