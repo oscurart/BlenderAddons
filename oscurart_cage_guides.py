@@ -10,11 +10,13 @@ cage = bpy.data.objects[bpy.context.scene.render.bake.cage_object]
 
 verts = []
 
-for v in cage.data.vertices:
-    verts.append(v.co + cage.matrix_world.to_translation()) 
+
+for v in cage.data.vertices:    
+    verts.append(cage.matrix_world * v.co ) 
+
 
 for v in lr.data.vertices :
-    verts.append(v.co + lr.matrix_world.to_translation()) 
+    verts.append(lr.matrix_world * v.co ) 
     
 lenVert = len(lr.data.vertices)    
 edges = [(i,i+lenVert)for i in range(0,len(lr.data.vertices))]
