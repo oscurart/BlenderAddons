@@ -34,7 +34,8 @@ for node in activeMat.node_tree.nodes:
             prps[node] = link      
         else:
             prps[node] = node.inputs['Specular'].default_value
-            node.inputs['Specular'].default_value = node.inputs['Metallic'].default_value   
+            node.inputs['Specular'].default_value = node.inputs['Metallic'].default_value  
+            node.inputs["Metallic"].default_value = 0  
 
 
 for link in activeMat.node_tree.links:
