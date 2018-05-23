@@ -1,12 +1,13 @@
 import bpy
 import os
 
-size = 1024
+size = 512
 
 channels = {"albedo":["AT","DIFFUSE"],
     "normal":["NM","NORMAL"],
     "emit":["EM","EMIT"],
     "roughness":["RO","ROUGHNESS"],
+    "opacity":["OP","TRANSMISSION"],
     "metallic":["ME","GLOSSY"]}
 
 
