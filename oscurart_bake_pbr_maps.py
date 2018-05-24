@@ -1,9 +1,9 @@
 import bpy
 import os
 
-
+# VARIABLES
 size = 512
-selected_to_active= False
+selected_to_active= True
 
 
 channels = {"metallic":["ME","GLOSSY"],
@@ -21,20 +21,32 @@ bpy.context.scene.render.bake.use_pass_indirect = 0
 bpy.context.scene.render.bake.use_pass_color = 1
 bpy.context.scene.render.bake.use_selected_to_active = selected_to_active
 
-
+selectedObjects = bpy.context.selected_objects[:].copy()
+selectedObjects.remove(bpy.context.active_object)
+if selected_to_active:
+    selObject=selectedObjects[0]
+    
 object = bpy.context.object
+
 metalstate = 0 #variable que indica que ya se desmetalizo.
 
 #lista de materiales originales y copias
-ms = [mat.material for mat in object.material_slots]
+if not selected_to_active:
+    ms = [mat.material for mat in object.material_slots]
+else:
+    ms = [mat.material for mat in selObject.material_slots]  
+    
 mscopy = []
-
+    
 #sumo materiales copia y reemplazo slots
 ims = 0
 for mat in ms:
     mc = mat.copy()
     mscopy.append(mc)
-    object.material_slots[ims].material = mc
+    if not selected_to_active:
+        object.material_slots[ims].material = mc
+    else:
+        selObject.material_slots[ims].material = mc    
     ims += 1
 
 #desmetalizar
@@ -53,10 +65,7 @@ def desmetalizar(activeMat):
                     matnode.inputs["Metallic"].default_value = 0     
                 else:
                     matnode.inputs["Metallic"].default_value = 0  
-                    matnode.inputs['Specular'].default_value = 0
-                   
-
-
+                    matnode.inputs['Specular'].default_value = 0       
  
 def bake(map):       
     global metalstate               
@@ -68,31 +77,54 @@ def bake(map):
         img.colorspace_settings.name = 'Linear' 
     img.filepath = "%s/%s_%s.png" % (imgpath, object.name, channels[map][0])
     # creo nodos y bakeo
-    for activeMat in mscopy:
+    if not selected_to_active:
+        for activeMat in mscopy:
+            #desmetalizo si no es metalico
+            if channels[map][0] != "ME":
+                if metalstate == 0:
+                    metalstate = 1
+                    desmetalizar(activeMat)        
+            
+            # seteo el nodo
+            print(activeMat)
+            node = activeMat.node_tree.nodes.new("ShaderNodeTexImage")
+            node.image = img
+            activeMat.node_tree.nodes.active = node
+            node.select = True
+    else:
+        print(object.active_material)
+        activeMat = bpy.context.object.active_material        
         #desmetalizo si no es metalico
         if channels[map][0] != "ME":
             if metalstate == 0:
                 metalstate = 1
-                desmetalizar(activeMat)        
-        
-        print(activeMat)
+                desmetalizar(activeMat)  
+                
+        # seteo el nodo
         node = activeMat.node_tree.nodes.new("ShaderNodeTexImage")
         node.image = img
         activeMat.node_tree.nodes.active = node
-        node.select = True
-    
+        node.select = True                
+                               
+        
     bpy.ops.object.bake(type=channels[map][1])
     img.save()
-    #bpy.data.images.remove(img)
-    #ctiveMat.node_tree.nodes.remove(node)    
-
-    
+    bpy.data.images.remove(img)
     
 
+
+
+#bakeo
 for map in channels.keys():
-    bake(map)    
+    bake(map)  
     
-    
-for matSlot,rms in zip(object.material_slots,ms):
+          
+   
+#restauro material slots    
+for matSlot,rms in zip(selObject.material_slots,ms):
     matSlot.material = rms
-        
+
+#remuevo materiales copia
+for ma in mscopy:
+    bpy.data.materials.remove(ma)        
+   
