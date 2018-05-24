@@ -63,6 +63,7 @@ def desmetalizar(activeMat):
                 if matnode.inputs['Metallic'].is_linked:    
         
                     matnode.inputs["Metallic"].default_value = 0     
+                    matnode.inputs["Specular"].default_value = 0 
                 else:
                     matnode.inputs["Metallic"].default_value = 0  
                     matnode.inputs['Specular'].default_value = 0       
