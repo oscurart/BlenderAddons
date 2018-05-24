@@ -3,7 +3,7 @@ import os
 
 # VARIABLES
 size = 512
-selected_to_active= False
+selected_to_active= True
 
 
 channels = {"metallic":["ME","GLOSSY"],
@@ -73,8 +73,14 @@ def MeToSpe():
     for mat in mscopy:
         for matnode in mat.node_tree.nodes:
             if matnode.type == "BSDF_PRINCIPLED":
-                mat.node_tree.links.new(matnode.inputs['Specular'],matnode.inputs['Metallic'].links[0].from_socket)  
-                matnode.inputs["Metallic"].default_value = 0      
+                if matnode.inputs['Metallic'].is_linked:
+                    mat.node_tree.links.new(matnode.inputs['Specular'],matnode.inputs['Metallic'].links[0].from_socket)  
+                    matnode.inputs["Metallic"].default_value = 0    
+                    matnode.inputs["Specular"].default_value = 0  
+                else:
+                    matnode.inputs["Metallic"].default_value = 0   
+                    matnode.inputs["Specular"].default_value = 0      
+                    
  
 def bake(map):       
     global metalstate               
