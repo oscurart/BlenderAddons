@@ -75,7 +75,10 @@ def bake(map):
     print ("Render: %s" % (channels[map][1]))
     if channels[map][0] != "AT":
         img.colorspace_settings.name = 'Linear' 
-    img.filepath = "%s/%s_%s.png" % (imgpath, object.name, channels[map][0])
+    if not selected_to_active:        
+        img.filepath = "%s/%s_%s.png" % (imgpath, object.name, channels[map][0])
+    else:
+        img.filepath = "%s/%s_%s.png" % (imgpath, object.active_material.name, channels[map][0])    
     # creo nodos y bakeo
     if not selected_to_active:
         for activeMat in mscopy:
