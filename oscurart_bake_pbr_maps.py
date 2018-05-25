@@ -79,7 +79,6 @@ def desespecular(material):
 #cambia slots
 def cambiaSlots(objeto,sufijo):
     for ms in objeto.material_slots:
-        print(sufijo)
         ms.material = bpy.data.materials[ms.material.name.rpartition("_")[0]+sufijo] 
 
 
@@ -133,6 +132,7 @@ def bake(map):
     bpy.ops.object.bake(type=channels[map][1])
     img.save()
     bpy.data.images.remove(img)
+    print ("%s Done!" % (channels[map][1]))
     
 
 
