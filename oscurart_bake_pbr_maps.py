@@ -53,6 +53,40 @@ copyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_copyTemp")]
 glossyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_glossyTemp")]
 
 
+# mezcloGlossy
+def mixGlossy(material):
+    mat = material
+
+    for node in mat.node_tree.nodes[:]:
+        if node.type == "BSDF_PRINCIPLED":            
+            nprin = mat.node_tree.nodes.new("ShaderNodeBsdfPrincipled") # nuevo principled
+
+            mix = mat.node_tree.nodes.new("ShaderNodeMixShader")
+            mat.node_tree.links.new(mix.inputs[2],nprin.outputs[0])
+            mat.node_tree.links.new(mix.inputs[1],node.outputs[0]) 
+            mat.node_tree.links.new(mix.inputs[0],node.inputs['Metallic'].links[0].from_socket)      
+            
+            #copio metalico
+            if node.inputs["Metallic"].is_linked:        
+                mat.node_tree.links.new(mix.inputs[0],node.inputs["Metallic"].links[0].from_socket)
+            mat.node_tree.links.new(node.outputs['BSDF'].links[0].to_socket,mix.outputs[0])
+            
+            #copio seteos de p a p
+            for entrada in ["Base Color","Roughness"]:
+                if node.inputs[entrada].is_linked:
+                      mat.node_tree.links.new(nprin.inputs[entrada],node.inputs[entrada].links[0].from_socket)
+                nprin.inputs[entrada].default_value =  node.inputs[entrada].default_value        
+                                      
+            node.inputs['Specular'].default_value = 0 
+            node.inputs['Metallic'].default_value = 0 # ambos a cero
+            nprin.inputs['Specular'].default_value = 0 
+            nprin.inputs['Metallic'].default_value = 1 # nuevo prin a 1
+
+    for link in mat.node_tree.links:
+        if link.to_socket.name == "Metallic":
+            mat.node_tree.links.remove(link)   
+
+
 #desmetalizar
 def desmetalizar(material):
     for link in mat.node_tree.links:
@@ -86,12 +120,13 @@ def cambiaSlots(objeto,sufijo):
 
 #saco los metales en las copias de copy  
 for mat in copyMats: 
-    desmetalizar(mat)   
+    desmetalizar(mat)      
     
 #saco los metales en las copias de glossy    
 for mat in glossyMats: 
     desespecular(mat)                     
- 
+    mixGlossy(mat) 
+    
 def bake(map):                    
     #crea imagen
     imgpath = "%s/IMAGES" % (os.path.dirname(bpy.data.filepath))
