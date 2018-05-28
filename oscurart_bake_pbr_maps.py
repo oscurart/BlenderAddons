@@ -64,7 +64,10 @@ def mixGlossy(material):
             mix = mat.node_tree.nodes.new("ShaderNodeMixShader")
             mat.node_tree.links.new(mix.inputs[2],nprin.outputs[0])
             mat.node_tree.links.new(mix.inputs[1],node.outputs[0]) 
-            mat.node_tree.links.new(mix.inputs[0],node.inputs['Metallic'].links[0].from_socket)      
+            if node.inputs["Metallic"].is_linked:  
+                mat.node_tree.links.new(mix.inputs[0],node.inputs['Metallic'].links[0].from_socket)    
+            else:
+                mix.inputs[0].default_value = node.inputs['Metallic'].default_value
             
             #copio metalico
             if node.inputs["Metallic"].is_linked:        
