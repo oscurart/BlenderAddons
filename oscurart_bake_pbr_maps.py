@@ -23,12 +23,23 @@ bpy.context.scene.render.bake.use_selected_to_active = selected_to_active
 
 selectedObjects = bpy.context.selected_objects[:].copy()
 selectedObjects.remove(bpy.context.active_object)
+object = bpy.context.object
+
+
 if selected_to_active:
-    selObject=selectedObjects[0]
+    #hago el merge
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in selectedObjects:
+        o.select = True
+    bpy.context.scene.objects.active  = selectedObjects[0]
+    bpy.ops.object.convert(target="MESH", keep_original=True)
+    selObject = bpy.context.active_object
+    bpy.ops.object.join()
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True, properties=True)
 else:
     selObject=bpy.context.object    
-    
-object = bpy.context.object
+
+bpy.context.scene.objects.active  = object 
 
 #lista de materiales originales
 if not selected_to_active:
@@ -51,6 +62,8 @@ for matType in ["_glossyTemp","_copyTemp"]:
 
 copyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_copyTemp")]
 glossyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_glossyTemp")]
+
+
 
 
 # mezcloGlossy
@@ -159,7 +172,7 @@ def bake(map):
             activeMat.node_tree.nodes.active = node
             node.select = True
     else:
-        activeMat = bpy.context.object.active_material               
+        activeMat = object.active_material               
         # seteo el nodo
         node = activeMat.node_tree.nodes.new("ShaderNodeTexImage")
         node.image = img
@@ -188,4 +201,8 @@ for matSlot,rms in zip(selObject.material_slots,ms):
 #remuevo materiales copia
 for ma in copyMats+glossyMats:
     bpy.data.materials.remove(ma)        
+
   
+#borro el merge
+if selected_to_active:
+    bpy.data.objects.remove(selObject, do_unlink=True, do_id_user=True, do_ui_user=True)
