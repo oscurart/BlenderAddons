@@ -39,6 +39,7 @@ def add_object(self, context):
                 ms.node_tree.nodes.remove(node)
         #Output
         mo = ms.node_tree.nodes["Material Output"]
+        mo.location = (0,0)
         moPos = mo.location
         #Principled
         principled = ms.node_tree.nodes.new("ShaderNodeBsdfPrincipled")
@@ -58,14 +59,16 @@ def add_object(self, context):
                     ms.node_tree.links.new(imageNode.outputs["Color"],principled.inputs['Base Color'])   
                     imageNode.location = (moPos[0]-900,moPos[1]+200)    
                     inChannel = True 
-                if texture.count("_MS"):
-                    ms.node_tree.links.new(imageNode.outputs["Color"],principled.inputs['Metallic'])  
-                    imageNode.location = (moPos[0]-900,moPos[1]-200)  
-                    invert = ms.node_tree.nodes.new("ShaderNodeInvert")    
-                    invert.location = (moPos[0]-600,moPos[1]-300)  
-                    ms.node_tree.links.new(imageNode.outputs["Color"],invert.inputs['Color'])   
-                    ms.node_tree.links.new(invert.outputs["Color"],principled.inputs['Roughness'])    
-                    inChannel = True                                                      
+                if texture.count("_ME"): 
+                    imageNode.location = (moPos[0]-900,moPos[1]-100)   
+                    ms.node_tree.links.new(imageNode.outputs["Color"],principled.inputs['Metallic'])    
+                    imageNode.color_space="NONE" 
+                    inChannel = True     
+                if texture.count("_RO"):
+                    imageNode.location = (moPos[0]-900,moPos[1]-400)   
+                    ms.node_tree.links.new(imageNode.outputs["Color"],principled.inputs['Roughness']) 
+                    imageNode.color_space="NONE"    
+                    inChannel = True                                                                            
                 if texture.count("_NM"):
                     imageNode.location = (moPos[0]-900,moPos[1]-500)
                     normalMap = ms.node_tree.nodes.new("ShaderNodeNormalMap")
@@ -75,13 +78,17 @@ def add_object(self, context):
                     imageNode.color_space="NONE"   
                     inChannel = True                     
                 if texture.count("_EM"):
+                    emission = ms.node_tree.nodes.new("ShaderNodeEmission")
+                    
                     imageNode.location = (moPos[0],moPos[1]-300)
                     add = ms.node_tree.nodes.new("ShaderNodeAddShader")
                     add.location = (moPos[0],moPos[1])
+                    emission.location = (add.location[0],add.location[1]-150)
                     moPos[0] += 300
                     ms.node_tree.links.new(add.outputs[0],mo.inputs[0]) 
                     ms.node_tree.links.new(principled.outputs[0],add.inputs[0]) 
-                    ms.node_tree.links.new(imageNode.outputs[0],add.inputs[1]) 
+                    ms.node_tree.links.new(imageNode.outputs[0],emission.inputs[0]) 
+                    ms.node_tree.links.new(emission.outputs[0],add.inputs[1]) 
                     imageNode.color_space="NONE"    
                     inChannel = True 
                 if inChannel == False:
@@ -117,6 +124,43 @@ class SuSetMaterialName(bpy.types.Operator):
             ob.material_slots[0].material.name = ob.name
 
         return {'FINISHED'}
+
+
+def mergeMeshes(self, context):
+    bpy.ops.object.convert(target="MESH", keep_original=True)
+    bpy.ops.object.join()
+
+    prefix = bpy.context.object.name[:7]
+
+    bpy.ops.view3d.view_selected()
+    bpy.ops.object.parent_clear(type="CLEAR_KEEP_TRANSFORM")
+    bpy.context.object.name = "%sMrg" % (prefix)
+    if len(bpy.context.object.vertex_groups) > 0:    
+        bpy.ops.object.vertex_group_remove(all=True, all_unlocked=True)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True, properties=True)
+    bpy.ops.mesh.vertex_color_remove()
+    gr = bpy.data.groups.new("%sMRG" % (prefix))
+    gr.objects.link(bpy.context.object)
+
+
+
+#Merge objects
+class SuMergeObjects(bpy.types.Operator):
+    """SU Merge Objects"""
+    bl_idname = "object.su_merge_objects"
+    bl_label = "SU Merge Objects"
+    bl_options = {'REGISTER', 'UNDO'}
+
+
+    def execute(self, context):
+
+        mergeMeshes(self,context)
+
+        return {'FINISHED'}
+
+            
+
+
 
 
 # Registration
