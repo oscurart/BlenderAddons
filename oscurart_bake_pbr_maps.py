@@ -207,7 +207,9 @@ def MetallicSmooth(token):
 
 
     meImg = bpy.data.images.load("%s/%s_ME.png" % (imgpath,token)) #CAMBIAAAAAAAAAR
+    meImg.colorspace_settings.name = 'Linear'
     roImg = bpy.data.images.load("%s/%s_RO.png" % (imgpath,token))
+    roImg.colorspace_settings.name = 'Linear'
 
     meNode = scene.node_tree.nodes.new("CompositorNodeImage")
     meNode.image = meImg
