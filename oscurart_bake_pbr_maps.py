@@ -2,7 +2,7 @@ import bpy
 import os
 
 # VARIABLES
-size = 128
+size = 512
 selected_to_active= True
 
 
