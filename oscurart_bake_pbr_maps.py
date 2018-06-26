@@ -7,6 +7,7 @@ selected_to_active= True
 
 
 channels = {"metallic":["ME","GLOSSY"],
+    "occlusion":["AO","AO"],
     "normal":["NM","NORMAL"],
     "emit":["EM","EMIT"],
     "roughness":["RO","ROUGHNESS"],
