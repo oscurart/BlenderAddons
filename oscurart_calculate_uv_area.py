@@ -1,7 +1,11 @@
 import bpy
 from mathutils import Vector
 
+mode = bpy.context.object.mode
+bpy.ops.object.mode_set(mode="OBJECT")
+
 uvAct = bpy.context.object.data.uv_layers.active
+
 
 def calcArea(v1,v2,v3):
     v12 = v2 - v1
@@ -21,7 +25,9 @@ for poly in bpy.context.object.data.polygons:
             uvAct.data[poly.loop_start+1+i].uv,
             uvAct.data[poly.loop_start+2+i].uv)  
         i += 1
-    print(poly.index, pa)
+    #print(poly.index, pa)
     total += pa
 
-print(total)        
+bpy.ops.object.mode_set(mode=mode)
+
+print("Area: %s percent" % (total))        
