@@ -21,19 +21,18 @@
 
 import bpy
 
-ob = bpy.context.object
-mat = ob.matrix_world
+for ob in bpy.context.selected_objects:
+    mat = ob.matrix_world
+    
+    ob.location = mat.to_translation()
+    ob.delta_location = (0,0,0)
 
+    if ob.rotation_mode == "QUATERNION":
+        ob.rotation_quaternion = mat.to_quaternion()
+        ob.delta_rotation_quaternion = (1,0,0,0)
+    else:
+        ob.rotation_euler = mat.to_euler()
+        ob.delta_rotation_euler = (0,0,0)    
 
-ob.location = mat.to_translation()
-ob.delta_location = (0,0,0)
-
-if ob.rotation_mode == "QUATERNION":
-    ob.rotation_quaternion = mat.to_quaternion()
-    ob.delta_rotation_quaternion = (1,0,0,0)
-else:
-    ob.rotation_euler = mat.to_euler()
-    ob.delta_rotation_euler = (0,0,0)    
-
-ob.scale = mat.to_scale()
-ob.delta_scale = (1,1,1)    
+    ob.scale = mat.to_scale()
+    ob.delta_scale = (1,1,1)    
