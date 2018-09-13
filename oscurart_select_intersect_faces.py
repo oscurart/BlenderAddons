@@ -48,13 +48,10 @@ noselTree = mathutils.bvhtree.BVHTree.FromPolygons(nocoVerts,nopolyVerts)
 #calculoArbol
 overlap = mathutils.bvhtree.BVHTree.overlap(selTree,noselTree)
 
-#forceDeselect    
-bpy.ops.object.mode_set(mode="EDIT") 
-bpy.ops.mesh.select_all(action="DESELECT")   
-bpy.ops.object.mode_set(mode="OBJECT")  
 
 for i in overlap:
     bpy.context.object.data.polygons[nofaceIndices[i[1]]].select = 1        
+
 
 
 bpy.ops.object.mode_set(mode="EDIT")
