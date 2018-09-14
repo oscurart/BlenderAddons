@@ -23,7 +23,7 @@ import mathutils
 
 
 actObj = bpy.context.object
-actMesh = actObj.to_mesh(bpy.context.scene, apply_modifiers=True, settings="RENDER", calc_tessface=True, calc_undeformed=True)
+actMesh = actObj.to_mesh(bpy.context.scene, apply_modifiers=False, settings="RENDER", calc_tessface=True, calc_undeformed=True)
 selObjs = bpy.context.selected_objects
 selObjs.remove(actObj)
 
@@ -45,7 +45,7 @@ selTree = mathutils.bvhtree.BVHTree.FromObject(actNewObject, bpy.context.scene,d
 
 for ob in selObjs:
     # creo objeto temporal
-    nm = ob.to_mesh(bpy.context.scene, apply_modifiers=True, settings="RENDER", calc_tessface=True, calc_undeformed=True)
+    nm = ob.to_mesh(bpy.context.scene, apply_modifiers=False, settings="RENDER", calc_tessface=True, calc_undeformed=True)
     nom = bpy.data.objects.new("tempNActObj", nm)
     bpy.context.scene.objects.link(nom)
     nmat = ob.matrix_world
