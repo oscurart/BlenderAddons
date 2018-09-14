@@ -24,7 +24,7 @@ import mathutils
 
 actObj = bpy.context.object
 actMesh = actObj.to_mesh(bpy.context.scene, apply_modifiers=True, settings="RENDER", calc_tessface=True, calc_undeformed=True)
-selObjs = [ob for ob in bpy.data.objects if ob.type == "MESH"]
+selObjs = bpy.context.selected_objects
 selObjs.remove(actObj)
 
 
