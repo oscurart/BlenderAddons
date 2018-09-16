@@ -41,11 +41,11 @@ for ob in bpy.context.selected_pose_bones:
     bpy.context.scene.frame_set(fs)
     side = -1 if ob.matrix.to_translation().x > 0 else 1
     bpy.context.object.data.pose_position = "POSE"
-    bpy.context.scene.frame_set(fs)
+    bpy.context.scene.frame_set(fs-1)
     prev = ob.matrix.copy()
     rot = 0 #initialPlace
     #bake
-    for i in range(fs,fe):
+    for i in range(fs,fe+1):
         bpy.context.scene.frame_set(i) 
         difRot = get_distance(prev.to_translation(),
             ob.matrix.to_translation(),
@@ -53,7 +53,7 @@ for ob in bpy.context.selected_pose_bones:
             side) 
         rot += difRot
         ob.rotation_euler.y = rot
-        ob.keyframe_insert("rotation_euler", index=-1, frame=i+1)
+        ob.keyframe_insert("rotation_euler", index=-1, frame=i)
         prev = ob.matrix.copy()   
 
 print("===================FINISH===================")
