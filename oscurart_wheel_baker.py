@@ -25,7 +25,7 @@ fs = bpy.context.scene.frame_start
 fe = bpy.context.scene.frame_end
 diameter = .244 #wheelDiameterinUnits
 
-def get_distance(moveVectorOld,moveVector,frente):
+def get_distance(moveVectorOld,moveVector,frente,side):
     dif = moveVector - moveVectorOld
     dir = frente - moveVector
     dot = dif.dot(dir)
@@ -38,6 +38,7 @@ for ob in bpy.context.selected_pose_bones:
     direccion = bpy.context.object.pose.bones[ob.name+"_vector"]
     #getSide
     bpy.context.object.data.pose_position = "REST"
+    bpy.context.scene.frame_set(fs)
     side = -1 if ob.matrix.to_translation().x > 0 else 1
     bpy.context.object.data.pose_position = "POSE"
     bpy.context.scene.frame_set(fs)
@@ -46,9 +47,13 @@ for ob in bpy.context.selected_pose_bones:
     #bake
     for i in range(fe-fs):
         bpy.context.scene.frame_set(i+1) 
-        difRot = get_distance(prev.to_translation(),ob.matrix.to_translation(),direccion.matrix.to_translation()) 
+        difRot = get_distance(prev.to_translation(),
+            ob.matrix.to_translation(),
+            direccion.matrix.to_translation(),
+            side) 
         rot += difRot
         ob.rotation_euler.y = rot
         ob.keyframe_insert("rotation_euler", index=-1, frame=i+1)
-        prev = ob.matrix.copy()
+        prev = ob.matrix.copy()   
 
+print("===================FINISH===================")
