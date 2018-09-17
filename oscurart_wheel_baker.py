@@ -22,7 +22,9 @@ from math import sqrt
 from math import atan2
 
 #WheelDirection
-wd = False
+wd = True
+#freeRotation
+freeRot = False
 
 fs = bpy.context.scene.frame_start
 fe = bpy.context.scene.frame_end
@@ -34,8 +36,13 @@ def get_distance(moveVectorOld,moveVector,frente,side):
     dot = dif.dot(dir)
     zeroMove = True if dif[0] == 0 and dif[1] == 0 else False
     i = 1 if dot >= 0 else -1
+    difFreeRot = dif.copy()
+    difFreeRot *= i
     if wd:
-       return [ side * dif.magnitude * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]
+        if freeRot:
+            return [ side * dif.magnitude * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]
+        else:
+            return [ side * dif.magnitude * i * (1/diameter), -atan2(difFreeRot[0],difFreeRot[1]) ,zeroMove]
     else:
        return [ side * dif.magnitude * i * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]    
 
