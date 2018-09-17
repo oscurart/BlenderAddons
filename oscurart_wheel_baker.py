@@ -19,6 +19,7 @@
 
 import bpy
 from math import sqrt
+from math import atan2
 
 
 fs = bpy.context.scene.frame_start
@@ -27,15 +28,20 @@ diameter = .244 #wheelDiameterinUnits
 
 def get_distance(moveVectorOld,moveVector,frente,side):
     dif = moveVector - moveVectorOld
+    difB = moveVector.copy() - moveVectorOld.copy()
+    difB.normalize()
     dir = frente - moveVector
     dot = dif.dot(dir)
     i = 1 if dot >= 0 else -1
-    return( side * dif.magnitude * i * (1/diameter) )
+    difB *= i
+    return[ side * dif.magnitude * i * (1/diameter), -atan2(difB[0],difB[1]) ]
 
 
 for ob in bpy.context.selected_pose_bones:
     #directionBone
-    direccion = bpy.context.object.pose.bones[ob.name+"_vector"]
+    direccion = bpy.context.object.pose.bones[ob.name+"_up"]
+    #panBone
+    pan = bpy.context.object.pose.bones[ob.name+"_pan"]
     #getSide
     bpy.context.object.data.pose_position = "REST"
     bpy.context.scene.frame_set(fs)
@@ -51,9 +57,15 @@ for ob in bpy.context.selected_pose_bones:
             ob.matrix.to_translation(),
             direccion.matrix.to_translation(),
             side) 
-        rot += difRot
+        #tilt    
+        rot += difRot[0]
         ob.rotation_euler.y = rot
         ob.keyframe_insert("rotation_euler", index=-1, frame=i)
+        #pan 
+        pan.rotation_euler.y = difRot[1]
+        pan.keyframe_insert("rotation_euler", index=-1, frame=i)       
+        
+        
         prev = ob.matrix.copy()   
 
 print("===================FINISH===================")
