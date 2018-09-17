@@ -22,7 +22,7 @@ from math import sqrt
 from math import atan2
 
 #WheelDirection
-wd = True
+wd = False
 
 fs = bpy.context.scene.frame_start
 fe = bpy.context.scene.frame_end
@@ -43,7 +43,7 @@ def get_distance(moveVectorOld,moveVector,frente,side):
 
 for ob in bpy.context.selected_pose_bones:
     #directionBone
-    direccion = bpy.context.object.pose.bones[ob.name+"_up"]
+    direccion = bpy.context.object.pose.bones[ob.name+"_vector"]
     #panBone
     if wd:
         pan = bpy.context.object.pose.bones[ob.name+"_pan"]
