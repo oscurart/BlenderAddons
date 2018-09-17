@@ -23,8 +23,6 @@ from math import atan2
 
 #WheelDirection
 wd = True
-#freeRotation
-freeRot = False
 
 fs = bpy.context.scene.frame_start
 fe = bpy.context.scene.frame_end
@@ -39,10 +37,7 @@ def get_distance(moveVectorOld,moveVector,frente,side):
     difFreeRot = dif.copy()
     difFreeRot *= i
     if wd:
-        if freeRot:
-            return [ side * dif.magnitude * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]
-        else:
-            return [ side * dif.magnitude * i * (1/diameter), -atan2(difFreeRot[0],difFreeRot[1]) ,zeroMove]
+        return [ side * dif.magnitude * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]
     else:
        return [ side * dif.magnitude * i * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]    
 
