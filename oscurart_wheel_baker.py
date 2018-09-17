@@ -32,9 +32,10 @@ def get_distance(moveVectorOld,moveVector,frente,side):
     difB.normalize()
     dir = frente - moveVector
     dot = dif.dot(dir)
+    zeroMove = True if difB[0] == 0 and difB[1] == 0 else False
     i = 1 if dot >= 0 else -1
     difB *= i
-    return[ side * dif.magnitude * i * (1/diameter), -atan2(difB[0],difB[1]) ]
+    return[ side * dif.magnitude * i * (1/diameter), -atan2(difB[0],difB[1]) ,zeroMove]
 
 
 for ob in bpy.context.selected_pose_bones:
@@ -50,6 +51,7 @@ for ob in bpy.context.selected_pose_bones:
     bpy.context.scene.frame_set(fs-1)
     prev = ob.matrix.copy()
     rot = 0 #initialPlace
+    directionPrev = 0 #dummy
     #bake
     for i in range(fs,fe+1):
         bpy.context.scene.frame_set(i) 
@@ -61,11 +63,14 @@ for ob in bpy.context.selected_pose_bones:
         rot += difRot[0]
         ob.rotation_euler.y = rot
         ob.keyframe_insert("rotation_euler", index=-1, frame=i)
+        print(difRot[2])
         #pan 
-        pan.rotation_euler.y = difRot[1]
-        pan.keyframe_insert("rotation_euler", index=-1, frame=i)       
+        #si no hay movimiento no se mueve
+        pan.rotation_euler.y = difRot[1] if difRot[2] == False else directionPrev 
+        pan.keyframe_insert("rotation_euler", index=-1, frame=i)  
         
-        
+        #adicionales        
+        directionPrev = difRot[1] if difRot[2] == False else directionPrev
         prev = ob.matrix.copy()   
 
 print("===================FINISH===================")
