@@ -26,7 +26,7 @@ wd = True
 
 fs = bpy.context.scene.frame_start
 fe = bpy.context.scene.frame_end
-diameter = .244 #wheelDiameterinUnits
+radius = .1 #wheelRadiusinUnits
 
 def get_distance(moveVectorOld,moveVector,frente,side):
     dif = moveVector - moveVectorOld
@@ -37,9 +37,9 @@ def get_distance(moveVectorOld,moveVector,frente,side):
     difFreeRot = dif.copy()
     difFreeRot *= i
     if wd:
-        return [ side * dif.magnitude * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]
+        return [ side * dif.magnitude * (1/radius), -atan2(dif[0],dif[1]) ,zeroMove]
     else:
-       return [ side * dif.magnitude * i * (1/diameter), -atan2(dif[0],dif[1]) ,zeroMove]    
+       return [ side * dif.magnitude * i * (1/radius), -atan2(dif[0],dif[1]) ,zeroMove]    
 
 
 
