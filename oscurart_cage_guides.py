@@ -3,6 +3,10 @@
 import bpy
 
 SUBDIVISIONS = 2
+inner = .95 #1
+outer = 1.05 #1
+
+
 
 me = bpy.data.meshes.new("mesh")
 ob = bpy.data.objects.new("object", me)
@@ -26,10 +30,10 @@ cage.modifiers.remove(ss)
 verts = []
 
 for v in ncage.vertices:    
-    verts.append(cage.matrix_world * v.co ) 
+    verts.append(cage.matrix_world * v.co * outer) 
 
 for v in nlr.vertices :
-    verts.append(lr.matrix_world * v.co ) 
+    verts.append(lr.matrix_world * v.co * inner) 
     
 lenVert = len(nlr.vertices)    
 edges = [(i,i+lenVert)for i in range(0,len(nlr.vertices))]
