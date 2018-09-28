@@ -22,13 +22,13 @@ bpy.context.scene.render.bake.use_pass_indirect = 0
 bpy.context.scene.render.bake.use_pass_color = 1
 bpy.context.scene.render.bake.use_selected_to_active = selected_to_active
 
+#agrupo los seleccionados y el activo
 selectedObjects = bpy.context.selected_objects[:].copy()
 selectedObjects.remove(bpy.context.active_object)
 object = bpy.context.object
 
-
+# si es selected to active hago un merge de los objetos restantes
 if selected_to_active:
-    #hago el merge
     bpy.ops.object.select_all(action="DESELECT")
     for o in selectedObjects:
         o.select = True
@@ -40,6 +40,7 @@ if selected_to_active:
 else:
     selObject=bpy.context.object    
 
+#seteo el objeto activo
 bpy.context.scene.objects.active  = object 
 
 #lista de materiales originales
@@ -50,7 +51,7 @@ else:
     
     
 #sumo materiales copia y reemplazo slots
-for matType in ["_glossyTemp","_copyTemp"]:
+for matType in ["_glossyTemp","_copyTemp","_roughnessTemp"]:
     ims = 0
     for mat in ms:
         mc = mat.copy()
@@ -63,6 +64,7 @@ for matType in ["_glossyTemp","_copyTemp"]:
 
 copyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_copyTemp")]
 glossyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_glossyTemp")]
+roughMats = [mat for mat in bpy.data.materials if mat.name.endswith("_roughnessTemp")]
 
 
 
@@ -126,6 +128,15 @@ def desespecular(material):
         if matnode.type == "BSDF_PRINCIPLED":
             matnode.inputs["Specular"].default_value = 0 
   
+
+#base color a 1
+def baseColorA1(material):
+    for link in mat.node_tree.links:
+        if link.to_socket.name == "Base Color":
+            mat.node_tree.links.remove(link)      
+    for node in mat.node_tree.nodes:
+        if node.type == "BSDF_PRINCIPLED":
+            node.inputs['Base Color'].default_value= (1,1,1,1)    
   
 #cambia slots
 def cambiaSlots(objeto,sufijo):
@@ -144,6 +155,12 @@ for mat in glossyMats:
     desespecular(mat)                     
     mixGlossy(mat) 
     
+#llevo a uno los base color de roughness  
+for mat in roughMats: 
+    desespecular(mat)                     
+    baseColorA1(mat)
+    
+    
 def bake(map):                    
     #crea imagen
     imgpath = "%s/IMAGES" % (os.path.dirname(bpy.data.filepath))
@@ -157,12 +174,15 @@ def bake(map):
         img.filepath = "%s/%s_%s.png" % (imgpath, object.active_material.name, channels[map][0])   
         
     #cambio materiales
-    if channels[map][0] != "AT":
-          cambiaSlots(selObject,"_copyTemp")
-    
     if channels[map][0] == "ME":
-          cambiaSlots(selObject,"_glossyTemp")                 
+          cambiaSlots(selObject,"_glossyTemp")   
           
+    if channels[map][0] == "RO":
+          cambiaSlots(selObject,"_roughnessTemp") 
+
+    if channels[map][0] in ["AT","AO","NM","EM","OP"]:
+          cambiaSlots(selObject,"_copyTemp")       
+                      
          
     # creo nodos y bakeo
     if not selected_to_active:
