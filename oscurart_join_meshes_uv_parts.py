@@ -36,8 +36,12 @@ uvLayersOrig = {}
 quadrantex = 0
 quadrantey = 0
 smooth = {}
+materials = {}
 
-for ob in bpy.context.selected_objects:
+for iob, ob in enumerate(bpy.context.selected_objects):
+    #materials
+    materials[iob] = ob.active_material.name    
+    
     obMatrix = ob.matrix_world    
     #vert position
     for vert in ob.data.vertices:
@@ -48,7 +52,8 @@ for ob in bpy.context.selected_objects:
         for indice in face.vertices[:]:
             facetemp.append(indice+indexSuma)
         totalFaces.append(facetemp)  
-        smooth[face.index+faceSuma] = face.use_smooth
+        #smooth material
+        smooth[face.index+faceSuma] = [face.use_smooth,iob]
     faces = [face.vertices[:] for face in ob.data.polygons]
     #uv data
     for i , uvl in enumerate(ob.data.uv_layers[0].data):
@@ -81,18 +86,25 @@ for i,uvt in enumerate(me.uv_layers["UVMap"].data):
 for i,uvo in enumerate(me.uv_layers["UVMapOrig"].data):
     uvo.uv = uvLayersOrig[i]
 
- 
-#set smooth 
-for i in smooth:
-    me.polygons[i].use_smooth = smooth[i]
-    print(smooth[i])
-
+#######bpy.context.object.material_slots[0].material = bpy.data.materials['PR0127_BarHandConvBack'] @@@@@
 #link mesh    
 ob = bpy.data.objects.new("MergeObject", me)
 bpy.context.scene.objects.link(ob)
+
+#material slots
+for imat,mat in materials.items():
+    ob.data.materials.append(bpy.data.materials[mat])
+
+#set smooth and mat
+for i in smooth:
+    me.polygons[i].use_smooth = smooth[i][0]  
+    me.polygons[i].material_index = smooth[i][1]
+
 
 #active object
 bpy.ops.object.select_all(action="DESELECT")
 ob.select = True
 bpy.context.scene.objects.active = ob
 bpy.ops.object.mode_set(mode="EDIT")
+
+print(materials)
