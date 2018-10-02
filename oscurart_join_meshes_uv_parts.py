@@ -23,7 +23,7 @@ import bmesh
 
 #variables
 parts = 2
-partsY = 1 #zero for non up
+quadsUp = 1 #zero for non up
 
 
 me = bpy.data.meshes.new("MergeObject")
@@ -64,7 +64,7 @@ for ob in bpy.context.selected_objects:
     quadrantex += 1
     if quadrantex == parts:
         quadrantex = 0
-        quadrantey += partsY
+        quadrantey += quadsUp
 
 #set mesh           
 me.from_pydata(totalVertices,[],totalFaces)
