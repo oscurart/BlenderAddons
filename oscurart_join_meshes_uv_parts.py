@@ -16,10 +16,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-
 import bpy
 import bmesh
-
 
 #variables
 parts = 2
@@ -34,6 +32,7 @@ uvLayerSuma = 0
 totalVertices = []
 totalFaces = []
 uvLayers = {}
+uvLayersOrig = {}
 quadrantex = 0
 quadrantey = 0
 smooth = {}
@@ -53,10 +52,13 @@ for ob in bpy.context.selected_objects:
     faces = [face.vertices[:] for face in ob.data.polygons]
     #uv data
     for i , uvl in enumerate(ob.data.uv_layers[0].data):
+        #offseteado
         quad = uvl.uv * (1/parts)
         quad[0] += ((1/parts)*quadrantex)
         quad[1] += ((1/parts)*quadrantey)
         uvLayers[i+uvLayerSuma] = quad
+        #original
+        uvLayersOrig[i+uvLayerSuma] = uvl.uv      
     #incremental variables    
     indexSuma += len(ob.data.vertices)
     faceSuma += len(ob.data.polygons)
@@ -69,10 +71,16 @@ for ob in bpy.context.selected_objects:
 #set mesh           
 me.from_pydata(totalVertices,[],totalFaces)
 uv = me.uv_textures.new(name="UVMap")
+uvorig = me.uv_textures.new(name="UVMapOrig")
 
 #set uvs
-for i,uv in enumerate(me.uv_layers[0].data):
-    uv.uv = uvLayers[i]
+for i,uvt in enumerate(me.uv_layers["UVMap"].data):
+    uvt.uv = uvLayers[i]
+
+#set original uv
+for i,uvo in enumerate(me.uv_layers["UVMapOrig"].data):
+    uvo.uv = uvLayersOrig[i]
+
  
 #set smooth 
 for i in smooth:
