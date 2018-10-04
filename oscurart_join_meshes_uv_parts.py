@@ -109,6 +109,8 @@ ob.select = True
 bpy.context.scene.objects.active = ob
 bpy.ops.object.mode_set(mode="EDIT")
 bpy.ops.mesh.select_all(action="SELECT") # selecciono vertices para uv
+bpy.ops.uv.select_all(action="SELECT")
+bpy.ops.uv.average_islands_scale()
 bpy.ops.uv.pack_islands(margin=.001) #pack uvs
 me.uv_textures['UVMapOrig'].active_render =1
 
