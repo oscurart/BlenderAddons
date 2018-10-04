@@ -103,21 +103,24 @@ for i in smooth:
     me.polygons[i].use_smooth = smooth[i][0]  
     me.polygons[i].material_index = smooth[i][1]
 
-#creo el uv atlas en los objetos anteriores
-for origOb,data in relObjVerts.items():
-    try:
-        bpy.context.object.data.uv_layers["Atlas"]
-    except:    
-        bpy.data.objects[origOb].data.uv_textures.new(name="Atlas")
-    for uvData in data:
-        bpy.data.objects[origOb].data.uv_layers["Atlas"].data[uvData[0]].uv = me.uv_layers["UVMap"].data[uvData[1]].uv
-
-#active object
+#pack uv
 bpy.ops.object.select_all(action="DESELECT")
 ob.select = True
 bpy.context.scene.objects.active = ob
 bpy.ops.object.mode_set(mode="EDIT")
+bpy.ops.mesh.select_all(action="SELECT") # selecciono vertices para uv
+bpy.ops.uv.pack_islands(margin=.001) #pack uvs
 me.uv_textures['UVMapOrig'].active_render =1
+
+#creo el uv atlas en los objetos anteriores
+bpy.ops.object.mode_set(mode="OBJECT")
+for origOb,data in relObjVerts.items():
+    try:
+        bpy.data.objects[origOb].data.uv_layers["Atlas"]
+    except:    
+        bpy.data.objects[origOb].data.uv_textures.new(name="Atlas")
+    for uvData in data:
+        bpy.data.objects[origOb].data.uv_layers["Atlas"].data[uvData[0]].uv = me.uv_layers["UVMap"].data[uvData[1]].uv
 
 
 print("-----------------------------------")
