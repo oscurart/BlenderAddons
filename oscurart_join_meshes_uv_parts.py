@@ -37,11 +37,13 @@ quadrantex = 0
 quadrantey = 0
 smooth = {}
 materials = {}
+relObjVerts = {}
 
 for iob, ob in enumerate(bpy.context.selected_objects):
+    relObjVerts[ob.name] = []
     #materials
-    materials[iob] = ob.active_material.name    
-    
+    materials[iob] = ob.active_material.name 
+    #matrix del objeto para multiplicar       
     obMatrix = ob.matrix_world    
     #vert position
     for vert in ob.data.vertices:
@@ -63,7 +65,9 @@ for iob, ob in enumerate(bpy.context.selected_objects):
         quad[1] += ((1/parts)*quadrantey)
         uvLayers[i+uvLayerSuma] = quad
         #original
-        uvLayersOrig[i+uvLayerSuma] = uvl.uv      
+        uvLayersOrig[i+uvLayerSuma] = uvl.uv     
+        #guardo los objetos y vertices relativos al objeto fuente
+        relObjVerts[ob.name].append([i,i+uvLayerSuma])
     #incremental variables    
     indexSuma += len(ob.data.vertices)
     faceSuma += len(ob.data.polygons)
@@ -86,7 +90,6 @@ for i,uvt in enumerate(me.uv_layers["UVMap"].data):
 for i,uvo in enumerate(me.uv_layers["UVMapOrig"].data):
     uvo.uv = uvLayersOrig[i]
 
-#######bpy.context.object.material_slots[0].material = bpy.data.materials['PR0127_BarHandConvBack'] @@@@@
 #link mesh    
 ob = bpy.data.objects.new("MergeObject", me)
 bpy.context.scene.objects.link(ob)
@@ -100,11 +103,21 @@ for i in smooth:
     me.polygons[i].use_smooth = smooth[i][0]  
     me.polygons[i].material_index = smooth[i][1]
 
+#creo el uv atlas en los objetos anteriores
+for origOb,data in relObjVerts.items():
+    try:
+        bpy.context.object.data.uv_layers["Atlas"]
+    except:    
+        bpy.data.objects[origOb].data.uv_textures.new(name="Atlas")
+    for uvData in data:
+        bpy.data.objects[origOb].data.uv_layers["Atlas"].data[uvData[0]].uv = me.uv_layers["UVMap"].data[uvData[1]].uv
 
 #active object
 bpy.ops.object.select_all(action="DESELECT")
 ob.select = True
 bpy.context.scene.objects.active = ob
 bpy.ops.object.mode_set(mode="EDIT")
+me.uv_textures['UVMapOrig'].active_render =1
 
-print(materials)
+
+print("-----------------------------------")
