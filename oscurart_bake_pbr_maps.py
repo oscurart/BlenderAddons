@@ -238,7 +238,7 @@ for matSlot,rms in zip(selObject.material_slots,ms):
     matSlot.material = rms
 
 #remuevo materiales copia
-for ma in copyMats+glossyMats+roughMats:
+for ma in copyMats+glossyMats+roughMats+transMats:
     bpy.data.materials.remove(ma)        
 
   
