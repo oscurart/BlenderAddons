@@ -180,7 +180,8 @@ for mat in roughMats:
 # saco metales para transmisiones
 for mat in transMats:     
     desmetalizar(mat)   
-    desespecular(mat)    
+    desespecular(mat)   
+    baseColorA1(mat) 
     
 def bake(map):                    
     #crea imagen
