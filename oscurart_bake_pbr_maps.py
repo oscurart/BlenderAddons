@@ -162,19 +162,22 @@ def cambiaSlots(objeto,sufijo):
 #saco los metales en las copias de copy  
 for mat in copyMats: 
     desmetalizar(mat)    
+    destransparentizar(mat)
 
     
 #saco los metales en las copias de glossy    
 for mat in glossyMats: 
     desespecular(mat)                     
     mixGlossy(mat) 
+    destransparentizar(mat)
     
 #llevo a uno los base color de roughness  
 for mat in roughMats: 
     desespecular(mat)                     
     baseColorA1(mat)
+    destransparentizar(mat)
 
-#    
+# saco metales para transmisiones
 for mat in transMats:     
     desmetalizar(mat)   
     desespecular(mat)    
