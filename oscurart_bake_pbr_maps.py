@@ -3,7 +3,7 @@ import os
 
 # VARIABLES
 size = 512
-selected_to_active= False
+selected_to_active= True
 
 
 channels = {"metallic":["ME","GLOSSY"],
