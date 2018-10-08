@@ -3,7 +3,7 @@ import os
 
 # VARIABLES
 size = 512
-selected_to_active= True
+selected_to_active= False
 
 
 channels = {"metallic":["ME","GLOSSY"],
@@ -51,7 +51,7 @@ else:
     
     
 #sumo materiales copia y reemplazo slots
-for matType in ["_glossyTemp","_copyTemp","_roughnessTemp"]:
+for matType in ["_glossyTemp","_copyTemp","_roughnessTemp","_trans"]:
     ims = 0
     for mat in ms:
         mc = mat.copy()
@@ -65,7 +65,7 @@ for matType in ["_glossyTemp","_copyTemp","_roughnessTemp"]:
 copyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_copyTemp")]
 glossyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_glossyTemp")]
 roughMats = [mat for mat in bpy.data.materials if mat.name.endswith("_roughnessTemp")]
-
+transMats = [mat for mat in bpy.data.materials if mat.name.endswith("_trans")]
 
 
 
@@ -121,6 +121,19 @@ def desmetalizar(material):
                 matnode.inputs["Metallic"].default_value = 0  
                 matnode.inputs['Specular'].default_value = 0       
 
+#destransparentizar
+def destransparentizar(material):
+    for link in mat.node_tree.links:
+        if link.to_socket.name == "Transmission":
+            mat.node_tree.links.remove(link)
+    for matnode in mat.node_tree.nodes:
+        if matnode.type == "BSDF_PRINCIPLED":
+            # desconecto metallic y seteo cero
+            if matnode.inputs['Transmission'].is_linked:           
+                matnode.inputs["Transmission"].default_value = 0       
+            else:
+                matnode.inputs["Transmission"].default_value = 0  
+
 
 #saca todos los speculares
 def desespecular(material):
@@ -148,7 +161,8 @@ def cambiaSlots(objeto,sufijo):
 
 #saco los metales en las copias de copy  
 for mat in copyMats: 
-    desmetalizar(mat)      
+    desmetalizar(mat)    
+
     
 #saco los metales en las copias de glossy    
 for mat in glossyMats: 
@@ -159,7 +173,11 @@ for mat in glossyMats:
 for mat in roughMats: 
     desespecular(mat)                     
     baseColorA1(mat)
-    
+
+#    
+for mat in transMats:     
+    desmetalizar(mat)   
+    desespecular(mat)    
     
 def bake(map):                    
     #crea imagen
@@ -182,7 +200,9 @@ def bake(map):
 
     if channels[map][0] in ["AT","AO","NM","EM","OP"]:
           cambiaSlots(selObject,"_copyTemp")       
-                      
+          
+    if channels[map][0] in ["OP"]:
+          cambiaSlots(selObject,"_trans")                        
          
     # creo nodos y bakeo
     if not selected_to_active:
