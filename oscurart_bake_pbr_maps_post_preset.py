@@ -1,6 +1,10 @@
 import bpy
 import os
 
+
+MS = True
+AT = True
+
 bpy.context.scene.render.image_settings.file_format = "PNG"
 bpy.context.scene.render.image_settings.color_mode = "RGBA"
 bpy.context.scene.render.image_settings.color_depth = "8"
@@ -35,8 +39,10 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
     meNode = scene.node_tree.nodes.new("CompositorNodeImage")
     meNode.image = colorImage
     
-    alphaOver = scene.node_tree.nodes.new("CompositorNodeAlphaOver")
-    alphaOver.inputs[1].default_value = (0,0,0,0)
+    setAlpha = scene.node_tree.nodes.new("CompositorNodeSetAlpha")
+
+    mixColor = scene.node_tree.nodes.new("CompositorNodeMixRGB")
+    alphaConvert = scene.node_tree.nodes.new("CompositorNodePremulKey")
 
     roNode = scene.node_tree.nodes.new("CompositorNodeImage")
     roNode.image = alphaImage
@@ -44,10 +50,20 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
     viewNode = scene.node_tree.nodes.new("CompositorNodeViewer")
 
 
-    scene.node_tree.links.new(viewNode.inputs['Image'], alphaOver.outputs['Image'])
-    scene.node_tree.links.new(alphaOver.inputs[2], meNode.outputs['Image'])
-    scene.node_tree.links.new(alphaOver.inputs[0], roNode.outputs['Image'])
+    scene.node_tree.links.new(viewNode.inputs[0], alphaConvert.outputs[0])
+    scene.node_tree.links.new(alphaConvert.inputs[0], setAlpha.outputs[0])
+    scene.node_tree.links.new(setAlpha.inputs[0], meNode.outputs[0])
+    scene.node_tree.links.new(setAlpha.inputs[1], mixColor.outputs[0])
+    scene.node_tree.links.new(mixColor.inputs[0], roNode.outputs[0])
+    
+    if colorMap == "_AT":
+        mixColor.inputs[1].default_value = (1,1,1,1)
+        mixColor.inputs[2].default_value = (.00001,.00001,.00001,1)
 
+    if colorMap == "_ME":
+        mixColor.inputs[1].default_value = (.00001,.00001,.00001,1)
+        mixColor.inputs[2].default_value =  (1,1,1,1)
+    
     viewNode.select = 1
     bpy.context.scene.node_tree.nodes.active  = viewNode
 
@@ -57,6 +73,7 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
     #guardo
     bpy.data.images['Viewer Node'].save_render("%s/%s%s.png" % (imgpath,matName,outputSufix))
 
+
     #restauro
     scene.use_nodes = compState
     area3D.type = "VIEW_3D"
@@ -64,13 +81,18 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
     scene.node_tree.nodes.remove(meNode)
     scene.node_tree.nodes.remove(roNode)
     scene.node_tree.nodes.remove(viewNode)
-    scene.node_tree.nodes.remove(alphaOver)  
-
+    scene.node_tree.nodes.remove(setAlpha) 
+    scene.node_tree.nodes.remove(alphaConvert)
+    scene.node_tree.nodes.remove(mixColor)  
 
 
 #render
-channelExport(bpy.context.object.active_material.name,"_ME","_RO","_MS")   
-channelExport(bpy.context.object.active_material.name,"_AT","_OP","_ATU")    
+if MS:
+    channelExport(bpy.context.object.active_material.name,"_ME","_RO","_MS")   
+
+
+if AT:
+    channelExport(bpy.context.object.active_material.name,"_AT","_OP","_ATU")    
    
 
 
