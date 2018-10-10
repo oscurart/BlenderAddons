@@ -15,6 +15,10 @@ channels = {"metallic":["ME","GLOSSY"],
     "albedo":["AT","DIFFUSE"]}
 
 
+bpy.context.scene.render.image_settings.file_format = "PNG"
+bpy.context.scene.render.image_settings.color_mode = "RGBA"
+bpy.context.scene.render.image_settings.color_depth = "16"
+
 #set bake options
 bpy.context.scene.render.bake_type = "TEXTURE"
 bpy.context.scene.render.bake.use_pass_direct = 0
