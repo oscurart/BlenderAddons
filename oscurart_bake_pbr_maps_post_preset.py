@@ -32,7 +32,12 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
 
 
     colorImage = bpy.data.images.load("%s/%s%s.png" % (imgpath,matName,colorMap))
-    colorImage.colorspace_settings.name = 'sRGB EOTF'
+    #perfiles lineales o log
+    if colorMap == "_AT":
+        colorImage.colorspace_settings.name = 'sRGB EOTF'
+    if colorMap == "_ME":
+        colorImage.colorspace_settings.name = 'Non-Colour Data'
+    
     alphaImage = bpy.data.images.load("%s/%s%s.png" % (imgpath,matName,alphaMap))
     alphaImage.colorspace_settings.name = 'Non-Colour Data'
 
@@ -48,13 +53,14 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
     roNode.image = alphaImage
 
     viewNode = scene.node_tree.nodes.new("CompositorNodeViewer")
-
-
+    
     scene.node_tree.links.new(viewNode.inputs[0], alphaConvert.outputs[0])
     scene.node_tree.links.new(alphaConvert.inputs[0], setAlpha.outputs[0])
     scene.node_tree.links.new(setAlpha.inputs[0], meNode.outputs[0])
     scene.node_tree.links.new(setAlpha.inputs[1], mixColor.outputs[0])
     scene.node_tree.links.new(mixColor.inputs[0], roNode.outputs[0])
+    
+
     
     if colorMap == "_AT":
         mixColor.inputs[1].default_value = (1,1,1,1)
@@ -63,6 +69,11 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
     if colorMap == "_ME":
         mixColor.inputs[1].default_value = (.00001,.00001,.00001,1)
         mixColor.inputs[2].default_value =  (1,1,1,1)
+        #mantengo la gama lineal para el metalico
+        gammaNode = scene.node_tree.nodes.new("CompositorNodeGamma")
+        gammaNode.inputs[1].default_value = 2.2   
+        scene.node_tree.links.new(setAlpha.inputs[0], gammaNode.outputs[0])  
+        scene.node_tree.links.new(gammaNode.inputs[0], meNode.outputs[0])    
     
     viewNode.select = 1
     bpy.context.scene.node_tree.nodes.active  = viewNode
