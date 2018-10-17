@@ -67,8 +67,8 @@ def channelExport(matName,colorMap,alphaMap,outputSufix):
         mixColor.inputs[2].default_value = (.00001,.00001,.00001,1)
 
     if colorMap == "_ME":
-        mixColor.inputs[1].default_value = (.00001,.00001,.00001,1)
-        mixColor.inputs[2].default_value =  (1,1,1,1)
+        mixColor.inputs[1].default_value = (1,1,1,1)
+        mixColor.inputs[2].default_value = (.00001,.00001,.00001,1)
         #mantengo la gama lineal para el metalico
         gammaNode = scene.node_tree.nodes.new("CompositorNodeGamma")
         gammaNode.inputs[1].default_value = 2.2   
