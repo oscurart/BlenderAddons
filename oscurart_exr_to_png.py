@@ -26,6 +26,7 @@ for image in os.listdir(imagePath):
     if image.endswith(".exr"):
         print("Procesando: %s" % (image))
         colorImage = bpy.data.images.load(os.path.join(absPath,"IMAGES",image))
+        colorImage.use_alpha = 0
         if image.endswith("_AT.exr"):
             colorImage.colorspace_settings.name = 'Non-Colour Data' 
         else:          

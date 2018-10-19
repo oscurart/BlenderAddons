@@ -5,6 +5,7 @@ object = bpy.context.object
 matList = [mat for mat in bpy.context.object.data.materials]
 matList = list(set(matList))
 imageSize = 2048
+bump = False
 
 materialSlots = [slot.material for slot in bpy.context.object.material_slots]
 
@@ -32,7 +33,8 @@ geoNode = occlusion.node_tree.nodes.new("ShaderNodeAmbientOcclusion")
 nmNode = occlusion.node_tree.nodes.new("ShaderNodeNormalMap") ##
 nmImgNode = occlusion.node_tree.nodes.new("ShaderNodeTexImage") ##
 nmImgNode.image = imgNM ##
-occlusion.node_tree.links.new(geoNode.inputs[2],nmNode.outputs[0]) ##DISABLE NORMALS
+if bump:
+    occlusion.node_tree.links.new(geoNode.inputs[2],nmNode.outputs[0]) ##DISABLE NORMALS
 nmImgNode.color_space = "NONE"
 occlusion.node_tree.links.new(nmNode.inputs[1],nmImgNode.outputs[0]) ##
 geoNode.inside = False
@@ -54,7 +56,8 @@ geoNode.inputs['Distance'].default_value = .005
 nmNode = pointness.node_tree.nodes.new("ShaderNodeNormalMap") ##
 nmImgNode = pointness.node_tree.nodes.new("ShaderNodeTexImage") ##
 nmImgNode.image = imgNM ##
-pointness.node_tree.links.new(geoNode.inputs[2],nmNode.outputs[0]) ## DISABLE NORMALS
+if bump:
+    pointness.node_tree.links.new(geoNode.inputs[2],nmNode.outputs[0]) ## DISABLE NORMALS
 nmImgNode.color_space = "NONE"
 pointness.node_tree.links.new(nmNode.inputs[1],nmImgNode.outputs[0]) ##
 pointness.node_tree.links.new(outNode.inputs[0],geoNode.outputs[1])
