@@ -20,13 +20,16 @@
 import bpy
 from math import sqrt
 from math import atan2
+from math import degrees
+from math import radians
 
 #WheelDirection
-wd = True
+wd = True #wheelDirection
+vehicle = True #no gira la rueda 180 grados
 
 fs = bpy.context.scene.frame_start
 fe = bpy.context.scene.frame_end
-radius = .1 #wheelRadiusinUnits
+radius = .5 #wheelRadiusinUnits
 
 def get_distance(moveVectorOld,moveVector,frente,side):
     dif = moveVector - moveVectorOld
@@ -36,8 +39,20 @@ def get_distance(moveVectorOld,moveVector,frente,side):
     i = 1 if dot >= 0 else -1
     difFreeRot = dif.copy()
     difFreeRot *= i
+    
+    difDegrees = degrees(-atan2(dif[0],dif[1]))
+    
+    # direction for vehicle
+    if dot < 0:
+        vehicleDir = radians(difDegrees + 180)
+    else:
+        vehicleDir = radians(difDegrees)    
+    
     if wd:
-        return [ side * dif.magnitude * (1/radius), -atan2(dif[0],dif[1]) ,zeroMove]
+        if vehicle:
+            return [ side * dif.magnitude * i * (1/radius), vehicleDir ,zeroMove]        
+        else:    
+            return [ side * dif.magnitude * (1/radius), -atan2(dif[0],dif[1]) ,zeroMove]
     else:
        return [ side * dif.magnitude * i * (1/radius), -atan2(dif[0],dif[1]) ,zeroMove]    
 
