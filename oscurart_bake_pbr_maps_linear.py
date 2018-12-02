@@ -1,79 +1,99 @@
 import bpy
 import os
 
-# VARIABLES
-sizex = 512
-sizey = 512
-selected_to_active= True
 
-
-channels = {"metallic":["ME","GLOSSY"],
-    "occlusion":["AO","AO"],
-    "normal":["NM","NORMAL"],
-    "emit":["EM","EMIT"],
-    "roughness":["RO","ROUGHNESS"],
-    "opacity":["OP","TRANSMISSION"],
-    "albedo":["AT","DIFFUSE"]}
-
-
-bpy.context.scene.render.image_settings.file_format = "OPEN_EXR"
-bpy.context.scene.render.image_settings.color_mode = "RGBA"
-bpy.context.scene.render.image_settings.exr_codec = "ZIP"
-bpy.context.scene.render.image_settings.color_depth = "16"
-
-#set bake options
-bpy.context.scene.render.bake_type = "TEXTURE"
-bpy.context.scene.render.bake.use_pass_direct = 0
-bpy.context.scene.render.bake.use_pass_indirect = 0
-bpy.context.scene.render.bake.use_pass_color = 1
-bpy.context.scene.render.bake.use_selected_to_active = selected_to_active
-
-#agrupo los seleccionados y el activo
-selectedObjects = bpy.context.selected_objects[:].copy()
-selectedObjects.remove(bpy.context.active_object)
-object = bpy.context.object
-
-# si es selected to active hago un merge de los objetos restantes
-if selected_to_active:
-    bpy.ops.object.select_all(action="DESELECT")
-    for o in selectedObjects:
-        o.select = True
-    bpy.context.scene.objects.active  = selectedObjects[0]
-    bpy.ops.object.convert(target="MESH", keep_original=True)
-    selObject = bpy.context.active_object
-    bpy.ops.object.join()
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True, properties=True)
-else:
-    selObject=bpy.context.object    
-
-#seteo el objeto activo
-bpy.context.scene.objects.active  = object 
-
-#lista de materiales originales
-if not selected_to_active:
-    ms = [mat.material for mat in object.material_slots]
-else:
-    ms = [mat.material for mat in selObject.material_slots]  
+def setSceneOpts():
+    global channels
+    global sizex
+    global sizey
+    global selected_to_active
     
+    # VARIABLES
+    sizex = bpy.context.scene.bake_pbr_channels.sizex
+    sizey = bpy.context.scene.bake_pbr_channels.sizey
+    selected_to_active= bpy.context.scene.bake_pbr_channels.seltoact
+
+    channels = {"metallic":["ME","GLOSSY"],
+        "occlusion":["AO","AO"],
+        "normal":["NM","NORMAL"],
+        "emit":["EM","EMIT"],
+        "roughness":["RO","ROUGHNESS"],
+        "opacity":["OP","TRANSMISSION"],
+        "albedo":["AT","DIFFUSE"]}
+
+    bpy.context.scene.render.image_settings.file_format = "OPEN_EXR"
+    bpy.context.scene.render.image_settings.color_mode = "RGBA"
+    bpy.context.scene.render.image_settings.exr_codec = "ZIP"
+    bpy.context.scene.render.image_settings.color_depth = "16"
+
+    #set bake options
+    bpy.context.scene.render.bake_type = "TEXTURE"
+    bpy.context.scene.render.bake.use_pass_direct = 0
+    bpy.context.scene.render.bake.use_pass_indirect = 0
+    bpy.context.scene.render.bake.use_pass_color = 1
+    bpy.context.scene.render.bake.use_selected_to_active = selected_to_active
+
+#__________________________________________________________________________________
+
+def mergeObjects():
+    global selectedObjects
+    global object 
+    global selObject
+    #agrupo los seleccionados y el activo
+    object = bpy.context.active_object
+    selectedObjects = bpy.context.selected_objects[:].copy()
+    selectedObjects.remove(bpy.context.active_object)
     
-#sumo materiales copia y reemplazo slots
-for matType in ["_glossyTemp","_copyTemp","_roughnessTemp","_trans"]:
-    ims = 0
-    for mat in ms:
-        mc = mat.copy()
-        mc.name =  mat.name+matType
-        if not selected_to_active:
-            object.material_slots[ims].material = mc
-        else:
-            selObject.material_slots[ims].material = mc    
-        ims += 1
 
-copyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_copyTemp")]
-glossyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_glossyTemp")]
-roughMats = [mat for mat in bpy.data.materials if mat.name.endswith("_roughnessTemp")]
-transMats = [mat for mat in bpy.data.materials if mat.name.endswith("_trans")]
+    # si es selected to active hago un merge de los objetos restantes
+    if selected_to_active:
+        bpy.ops.object.select_all(action="DESELECT")
+        for o in selectedObjects:
+            o.select = True
+        bpy.context.scene.objects.active  = selectedObjects[0]
+        bpy.ops.object.convert(target="MESH", keep_original=True)
+        selObject = bpy.context.active_object
+        bpy.ops.object.join()
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True, properties=True)
+    else:
+        selObject=bpy.context.object    
 
+    #seteo el objeto activo
+    bpy.context.scene.objects.active  = object 
 
+#__________________________________________________________________________________
+
+def createTempMats():
+    global ms
+    global copyMats
+    global roughMats
+    global transMats
+    global glossyMats
+    
+    #lista de materiales originales
+    if not selected_to_active:
+        ms = [mat.material for mat in object.material_slots]
+    else:
+        ms = [mat.material for mat in selObject.material_slots]  
+                
+    #sumo materiales copia y reemplazo slots
+    for matType in ["_glossyTemp","_copyTemp","_roughnessTemp","_trans"]:
+        ims = 0
+        for mat in ms:
+            mc = mat.copy()
+            mc.name =  mat.name+matType
+            if not selected_to_active:
+                object.material_slots[ims].material = mc
+            else:
+                selObject.material_slots[ims].material = mc    
+            ims += 1
+
+    copyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_copyTemp")]
+    glossyMats = [mat for mat in bpy.data.materials if mat.name.endswith("_glossyTemp")]
+    roughMats = [mat for mat in bpy.data.materials if mat.name.endswith("_roughnessTemp")]
+    transMats = [mat for mat in bpy.data.materials if mat.name.endswith("_trans")]
+
+#__________________________________________________________________________________
 
 # mezcloGlossy
 def mixGlossy(material):
@@ -111,6 +131,8 @@ def mixGlossy(material):
         if link.to_socket.name == "Metallic":
             mat.node_tree.links.remove(link)   
 
+
+#__________________________________________________________________________________
 
 #desmetalizar
 def desmetalizar(material):
@@ -162,34 +184,37 @@ def cambiaSlots(objeto,sufijo):
     for ms in objeto.material_slots:
         ms.material = bpy.data.materials[ms.material.name.rpartition("_")[0]+sufijo] 
 
+#__________________________________________________________________________________
 
+def removeMatProps():
+    global mat
+    #saco los metales en las copias de copy  
+    for mat in copyMats: 
+        desmetalizar(mat)    
+        destransparentizar(mat)
 
+        
+    #saco los metales en las copias de glossy    
+    for mat in glossyMats: 
+        desespecular(mat)                     
+        mixGlossy(mat) 
+        destransparentizar(mat)
+        
+    #llevo a uno los base color de roughness  
+    for mat in roughMats: 
+        desespecular(mat)                     
+        baseColorA1(mat)
+        destransparentizar(mat)
 
-#saco los metales en las copias de copy  
-for mat in copyMats: 
-    desmetalizar(mat)    
-    destransparentizar(mat)
-
+    # saco metales para transmisiones
+    for mat in transMats:     
+        desmetalizar(mat)   
+        desespecular(mat)   
+        baseColorA1(mat) 
     
-#saco los metales en las copias de glossy    
-for mat in glossyMats: 
-    desespecular(mat)                     
-    mixGlossy(mat) 
-    destransparentizar(mat)
+#__________________________________________________________________________________   
     
-#llevo a uno los base color de roughness  
-for mat in roughMats: 
-    desespecular(mat)                     
-    baseColorA1(mat)
-    destransparentizar(mat)
-
-# saco metales para transmisiones
-for mat in transMats:     
-    desmetalizar(mat)   
-    desespecular(mat)   
-    baseColorA1(mat) 
-    
-def bake(map):                    
+def bake(map):                       
     #crea imagen
     imgpath = "%s/IMAGES" % (os.path.dirname(bpy.data.filepath))
     img = bpy.data.images.new(channels[map][0],  width=sizex, height=sizey, alpha=True,float_buffer=True)
@@ -238,22 +263,111 @@ def bake(map):
     bpy.data.images.remove(img)
     print ("%s Done!" % (channels[map][1]))
     
+#__________________________________________________________________________________
+
+def executePbr():
+    #bakeo
+    setSceneOpts() 
+    mergeObjects()
+    createTempMats()
+    removeMatProps() 
+    for map in channels.keys():
+        if getattr(bpy.context.scene.bake_pbr_channels,map):
+            bake(map)  
+
+       
+    #restauro material slots    
+    for matSlot,rms in zip(selObject.material_slots,ms):
+        matSlot.material = rms
+
+    #remuevo materiales copia
+    for ma in copyMats+glossyMats+roughMats+transMats:
+        bpy.data.materials.remove(ma)        
+
+      
+    #borro el merge
+    if selected_to_active:
+        bpy.data.objects.remove(selObject, do_unlink=True, do_id_user=True, do_ui_user=True)
+    
+    
+class BakePbr (bpy.types.Operator):
+    """Bake PBR materials"""
+    bl_idname = "object.bake_pbr_maps"
+    bl_label = "Bake PBR Maps"
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None
+
+    def execute(self, context):
+        executePbr()
+        return {'FINISHED'}       
+    
+
+#__________________________________________________________________________________
 
 
-#bakeo
-for map in channels.keys():
-    bake(map)  
 
-   
-#restauro material slots    
-for matSlot,rms in zip(selObject.material_slots,ms):
-    matSlot.material = rms
+class bakeChannels(bpy.types.PropertyGroup):
+    metallic = bpy.props.BoolProperty(name="Metallic",default=False)
+    occlusion = bpy.props.BoolProperty(name="Occlusion",default=False)
+    normal = bpy.props.BoolProperty(name="Normal",default=False)
+    emit = bpy.props.BoolProperty(name="Emit",default=False)
+    roughness = bpy.props.BoolProperty(name="Roughness",default=False)
+    opacity = bpy.props.BoolProperty(name="Opacity",default=False)
+    albedo = bpy.props.BoolProperty(name="Albedo",default=False)
+    sizex = bpy.props.IntProperty(name="Size x", default= 1024)
+    sizey = bpy.props.IntProperty(name="Size y", default= 1024)
+    seltoact = bpy.props.BoolProperty(name="Selected to active", default= True)
 
-#remuevo materiales copia
-for ma in copyMats+glossyMats+roughMats+transMats:
-    bpy.data.materials.remove(ma)        
+bpy.utils.register_class(bakeChannels)
 
-  
-#borro el merge
-if selected_to_active:
-    bpy.data.objects.remove(selObject, do_unlink=True, do_id_user=True, do_ui_user=True)
+
+class LayoutDemoPanel(bpy.types.Panel):
+    """Creates a Panel in the scene context of the properties editor"""
+    bl_label = "Bake PBR"
+    bl_idname = "RENDER_PT_layout"
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = "render"
+
+    def draw(self, context):
+        layout = self.layout
+
+        scene = context.scene
+
+        # Create a simple row.
+        layout.label(text=" Channels:")
+
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "metallic")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "occlusion")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "normal")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "emit")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "roughness")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "opacity")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "albedo")
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "sizex")    
+        row.prop(scene.bake_pbr_channels, "sizey")   
+        row = layout.row()
+        row.prop(scene.bake_pbr_channels, "seltoact")     
+        # Big render button
+        layout.label(text="Big Button:")
+        row = layout.row()
+        row.scale_y = 2
+        row.operator("object.bake_pbr_maps")
+
+
+
+#__________________________________________________________________________________
+
+bpy.types.Scene.bake_pbr_channels = bpy.props.PointerProperty(type=bakeChannels)
+bpy.utils.register_class(LayoutDemoPanel)    
+bpy.utils.register_class(BakePbr)    
