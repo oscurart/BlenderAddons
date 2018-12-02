@@ -56,7 +56,7 @@ def mergeObjects():
         bpy.ops.object.join()
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True, properties=True)
     else:
-        selObject=bpy.context.object    
+        selObject=bpy.context.active_object   
 
     #seteo el objeto activo
     bpy.context.scene.objects.active  = object 
@@ -359,7 +359,6 @@ class LayoutDemoPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scene.bake_pbr_channels, "seltoact")     
         # Big render button
-        layout.label(text="Big Button:")
         row = layout.row()
         row.scale_y = 2
         row.operator("object.bake_pbr_maps")
