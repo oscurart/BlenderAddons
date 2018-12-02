@@ -2,7 +2,8 @@ import bpy
 import os
 
 # VARIABLES
-size = 512
+sizex = 512
+sizey = 512
 selected_to_active= True
 
 
@@ -191,7 +192,7 @@ for mat in transMats:
 def bake(map):                    
     #crea imagen
     imgpath = "%s/IMAGES" % (os.path.dirname(bpy.data.filepath))
-    img = bpy.data.images.new(channels[map][0],  width=size, height=size, alpha=True,float_buffer=True)
+    img = bpy.data.images.new(channels[map][0],  width=sizex, height=sizey, alpha=True,float_buffer=True)
     print ("Render: %s" % (channels[map][1]))
     img.colorspace_settings.name = 'Linear' 
   
