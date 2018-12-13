@@ -62,12 +62,12 @@ def add_object(self, context):
                 if texture.count("_ME"): 
                     imageNode.location = (moPos[0]-900,moPos[1]-100)   
                     ms.node_tree.links.new(imageNode.outputs["Color"],principled.inputs['Metallic'])    
-                    imageNode.color_space="NONE" 
+                    #imageNode.color_space="NONE" 
                     inChannel = True     
                 if texture.count("_RO"):
                     imageNode.location = (moPos[0]-900,moPos[1]-400)   
                     ms.node_tree.links.new(imageNode.outputs["Color"],principled.inputs['Roughness']) 
-                    imageNode.color_space="NONE"    
+                    #imageNode.color_space="NONE"    
                     inChannel = True                                                                            
                 if texture.count("_NM"):
                     imageNode.location = (moPos[0]-900,moPos[1]-500)
@@ -75,7 +75,7 @@ def add_object(self, context):
                     normalMap.location = (moPos[0]-600,moPos[1]-500) 
                     ms.node_tree.links.new(normalMap.outputs["Normal"],principled.inputs['Normal']) 
                     ms.node_tree.links.new(imageNode.outputs["Color"],normalMap.inputs['Color']) 
-                    imageNode.color_space="NONE"   
+                    #imageNode.color_space="NONE"   
                     inChannel = True                     
                 if texture.count("_EM"):
                     emission = ms.node_tree.nodes.new("ShaderNodeEmission")
@@ -89,7 +89,7 @@ def add_object(self, context):
                     ms.node_tree.links.new(principled.outputs[0],add.inputs[0]) 
                     ms.node_tree.links.new(imageNode.outputs[0],emission.inputs[0]) 
                     ms.node_tree.links.new(emission.outputs[0],add.inputs[1]) 
-                    imageNode.color_space="NONE"    
+                    #imageNode.color_space="NONE"    
                     inChannel = True 
                 if inChannel == False:
                     iPos -= 200    
