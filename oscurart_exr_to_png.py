@@ -10,7 +10,7 @@ os.listdir(imagePath)
 bpy.context.scene.render.image_settings.file_format = "PNG"
 bpy.context.scene.render.image_settings.color_mode = "RGBA"
 bpy.context.scene.render.image_settings.color_depth = "8"
-bpy.context.scene.view_settings.view_transform = "sRGB EOTF"
+bpy.context.scene.view_settings.view_transform = "sRGB OETF"
 bpy.context.scene.view_settings.gamma = 1
 
 scene.use_nodes = True
@@ -30,7 +30,7 @@ for image in os.listdir(imagePath):
         if image.endswith("_AT.exr"):
             colorImage.colorspace_settings.name = 'Non-Colour Data' 
         else:          
-            colorImage.colorspace_settings.name = 'sRGB EOTF'
+            colorImage.colorspace_settings.name = 'sRGB OETF'
         imgNode.image = colorImage
         bpy.ops.render.render()   
         print(os.path.join(absPath,"IMAGES",image.replace(".exr",".png")))     
