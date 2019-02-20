@@ -28,14 +28,16 @@ for node in bpy.context.object.data.materials[0].node_tree.nodes:
         nodeImage = bpy.context.scene.node_tree.nodes.new("CompositorNodeImage")
         nodeImage.image = node.image
         if node.image.name.count("_AT"):
-            bpy.context.scene.node_tree.links.new(bpy.context.scene.node_tree.nodes['Group'].inputs['Albedo'], nodeImage.outputs[0])
+            bpy.context.scene.node_tree.links.new(presetNode.inputs['Albedo'], nodeImage.outputs[0])
+            imgPrefix = os.path.basename(node.image.filepath).replace("_AT.exr","")
         if node.image.name.count("_ME"):
-            bpy.context.scene.node_tree.links.new(bpy.context.scene.node_tree.nodes['Group'].inputs['Metallic'], nodeImage.outputs[0])     
+            bpy.context.scene.node_tree.links.new(presetNode.inputs['Metallic'], nodeImage.outputs[0])     
         if node.image.name.count("_RO"):
-            bpy.context.scene.node_tree.links.new(bpy.context.scene.node_tree.nodes['Group'].inputs['Roughness'], nodeImage.outputs[0]) 
+            bpy.context.scene.node_tree.links.new(presetNode.inputs['Roughness'], nodeImage.outputs[0]) 
         if node.image.name.count("_OP"):
-            bpy.context.scene.node_tree.links.new(bpy.context.scene.node_tree.nodes['Group'].inputs['Opacity'], nodeImage.outputs[0])  
+            bpy.context.scene.node_tree.links.new(presetNode.inputs['Opacity'], nodeImage.outputs[0])  
 
+print(imgPrefix)
 #funcion para renderear
 def render(pst):
     bpy.context.scene.node_tree.links.new(viewerNode.inputs[0],
@@ -43,7 +45,7 @@ def render(pst):
     #renderDummy
     bpy.ops.render.render()
     #guardo
-    bpy.data.images['Viewer Node'].save_render("%s/IMAGES/Plane_%s_.exr" % (os.path.dirname(bpy.data.filepath),pst)) 
+    bpy.data.images['Viewer Node'].save_render("%s/IMAGES/%s_%s_.exr" % (os.path.dirname(bpy.data.filepath),imgPrefix,pst)) 
 
 
 #call para renderear            
