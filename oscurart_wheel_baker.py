@@ -84,7 +84,7 @@ for ob in bpy.context.selected_pose_bones:
         rot += difRot[0]
         ob.rotation_euler.y = rot
         ob.keyframe_insert("rotation_euler", index=-1, frame=i)
-        print(difRot[2])
+        print("Bone: %s Frame:%s " % (ob.name,i))
         #pan 
         if wd:
             #si no hay movimiento no se mueve
